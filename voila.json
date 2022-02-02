@@ -1,0 +1,8 @@
+{
+    "RegexRemovePreprocessor": {
+        "patterns": [
+            "#nbd .*voila-hide",
+            "\\[nbd\\]: #.*voila-hide"
+        ]
+    }
+}

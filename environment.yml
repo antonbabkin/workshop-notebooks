@@ -1,0 +1,12 @@
+name: workshop-nbs-2022
+channels:
+  - conda-forge
+dependencies:
+  - python=3.9
+  - jupyterlab>=3
+  - geopandas
+  - matplotlib
+  - ipywidgets
+  - ipyleaflet
+  - nbdime
+  - voila
