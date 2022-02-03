@@ -57,7 +57,7 @@ def pop_1990_1999():
                     data.write(line)
 
     data.seek(0)
-    df = pd.read_fwf(data, dtype='str', header=None, columns=cols)
+    df = pd.read_fwf(data, dtype='str', header=None)
     # skip first row (US total), keep fips and popest cols
     df = df.iloc[1:, 1:13]
     df.columns = ['fips'] + [f'pop{y}' for y in range(2000, 1989, -1)]
