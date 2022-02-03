@@ -4,6 +4,7 @@
 import os
 import re
 import inspect
+import shutil
 from urllib.parse import urlparse
 from pathlib import Path
 import io
@@ -12,17 +13,22 @@ import requests
 import nbconvert
 import nbformat
 
+import mkdocs.config, mkdocs.commands.build
+
 
 class Nbd:
-    def __init__(self, pkg_name, nbs_dir='nbs'):
+    def __init__(self, pkg_name):
         self.pkg_name = pkg_name
-        self.nbs_dir = nbs_dir
+        self.nbs_dir = 'nbs'
         self.root = self._locate_root_path()
         p = self.pkg_path = self.root/pkg_name
         assert p.exists() and p.is_dir()
-        p = self.nbs_path = self.root/nbs_dir
+        p = self.nbs_path = self.root/'nbs'
         assert p.exists() and p.is_dir()
         self._make_symlinks()
+        
+        self.docs_config = mkdocs.config.load_config((self.root/'mkdocs.yml').open())
+        self.docs_path = Path(self.docs_config['docs_dir'])
         
     def _locate_root_path(self):
         # call stack: 0=this function, 1=__init__(), 2=caller
@@ -110,6 +116,72 @@ class Nbd:
         if cell.cell_type == 'markdown' and first_line.startswith('[nbd]:'):
             return first_line.split('"')[1].split()
         return []
+    
+    def nb2doc(self, nb_rel_path):
+        """`nb_rel_path` is relative to project's notebook directory."""
+        nb_rel_path = Path(nb_rel_path)
+        nb_path = self.nbs_path/nb_rel_path
+        assert nb_path.exists() and nb_path.is_file(), f'Notebook not found at "{nb_path}".'
+        nb = nbformat.read(nb_path, nbformat.current_nbformat)
+        nb.cells = [c for c in nb.cells if ('docs' in self.get_cell_flags(c))]
+        exporter = nbconvert.exporters.MarkdownExporter()
+        md, res = exporter.from_notebook_node(nb)
+        
+        # remove #nbd lines, change img paths
+        md = '\n'.join(self.rename_img(l, nb_rel_path.stem)
+                       for l in md.split('\n')
+                       if not (l.startswith('#nbd') or l.startswith('[nbd]:')))
+        
+        w = nbconvert.writers.FilesWriter(build_directory=str(self.docs_path))
+        md_path = w.write(md, res, nb_rel_path.stem)
+        
+        # move imgs to new paths
+        imgs = []
+        if res['outputs'] != '':
+            for img in res['outputs'].keys():
+                old = self.docs_path/Path(img)
+                new_dir = old.parent/'img'
+                new_dir.mkdir(parents=True, exist_ok=True)
+                new = new_dir/f'{nb_rel_path.stem}_{img}'
+                old.rename(new)
+                imgs.append(new)
+        
+        src = nb_path.relative_to(self.root)
+        dst = md_path.relative_to(self.root)
+        imgs = (' and images ' + ', '.join(f'"{p.relative_to(self.root)}"' for p in imgs)
+                if imgs else '')
+        print(f'Converted notebook "{src}" to document "{dst}"{imgs}.')
+
+    @staticmethod
+    def rename_img(line, nb_basename):
+        """
+        Replace line like "![png](output.png)" with "![png](notebook_output.png)"
+        """
+        pattern = r'^.*!\[.+?\]\((.+?)\).*$'
+        m = re.match(pattern, line)
+        if not m: 
+            return line
+        old = m.group(1)
+        new = str(Path('img')/f'{nb_basename}_{old}')
+        return line.replace(old, new)
+
+    def build_docs(self):
+        print(f'Cleaning docs directory at "{self.docs_path.relative_to(self.root)}"...')
+        shutil.rmtree(self.docs_path)
+        self.docs_path.mkdir(parents=True, exist_ok=True)
+        for item in self.docs_config['nav']:
+            md_path = list(item.values())[0]
+            assert isinstance(md_path, str) and md_path.endswith('.md'), md_path
+            if md_path == 'README.md':
+                s = self.root/'README.md'
+                d = self.docs_path/'README.md'
+                shutil.copyfile(s, d)
+                print(f'Copied "{s.relative_to(self.root)}" to "{d.relative_to(self.root)}".')
+            else:
+                self.nb2doc(Path(md_path).with_suffix('.ipynb'))
+        mkdocs.commands.build.build(self.docs_config)
+        p = Path(self.docs_config['site_dir']).relative_to(self.root)
+        print(f'Documentation built in "{p}".')
 
 
 def download_file(url, dir=None, fname=None, overwrite=False, verbose=True):

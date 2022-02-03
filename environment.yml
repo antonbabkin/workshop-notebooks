@@ -10,3 +10,5 @@ dependencies:
   - ipyleaflet
   - nbdime
   - voila
+  - mkdocs
+  - python-markdown-math

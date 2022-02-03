@@ -1,0 +1,13 @@
+site_name: Notebook Imperialism
+
+markdown_extensions: 
+    - mdx_math:
+        enable_dollar_delimiter: True
+
+extra_javascript: ['https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-AMS_HTML']
+
+nav:
+    - Home: 'README.md'
+    - Data: 'data.md'
+    - Analysis: 'analysis.md'
+    - Tools: 'tools.md'
