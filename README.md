@@ -1,6 +1,7 @@
 # Literate programming and interactive reporting with Jupyter notebooks
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/antonbabkin/workshop-notebooks/HEAD?urlpath=lab)
+[Dashboard](https://mybinder.org/v2/gh/antonbabkin/workshop-notebooks/HEAD?urlpath=voila%2Frender%2Fnbs%2Fdashboard.ipynb)
 
 Workshop materials for the [2022 Data Science Research Bazaar](https://datascience.wisc.edu/data-science-research-bazaar/) at UW-Madison.
 
@@ -10,7 +11,6 @@ Prior programming and data analysis experience is recommended for full participa
 
 Workshop topics: 
 - Jupyter notebooks and Markdown
-- Git and GitHub basics
 - code organization, Python modules and packages, conversion to scripts
 - static documentation, conversion to HTML
 - data retrieval via download and API
