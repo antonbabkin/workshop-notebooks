@@ -145,8 +145,8 @@ def emp():
     df = pd.concat([d1, d2, df], ignore_index=True)
     df = df.rename(columns={'net_job_creation_rate': 'emp_gr'})
     df['year'] = df['year'].astype('int16')
-    df['emp'] = pd.to_numeric(df['emp'], 'coerce').astype('Int32')
-    df['emp_gr'] = pd.to_numeric(df['emp_gr'], 'coerce').astype('Float32')
+    df['emp'] = pd.to_numeric(df['emp'], 'coerce')
+    df['emp_gr'] = pd.to_numeric(df['emp_gr'], 'coerce')
     df = df[['st', 'cty', 'year', 'emp', 'emp_gr']]
     
     df.to_pickle(df_file)
