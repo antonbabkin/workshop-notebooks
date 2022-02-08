@@ -123,14 +123,15 @@ def compute_agr(y0, y1):
     return d
 
 
-def color_from_agr_cat(df, abs_rel):
-    m = {
-        'pop+ emp+': 'red',
-        'pop+ emp-': 'green',
-        'pop- emp+': 'orange',
-        'pop- emp-': 'blue'
-    }        
-    return df['agr_cat_' + abs_rel].map(m)
+agr_colors = {
+    'pop+ emp+': '#d95f02',
+    'pop+ emp-': '#1b9e77',
+    'pop- emp+': '#e7298a',
+    'pop- emp-': '#7570b3'
+}     
+
+def color_from_agr_cat(df, abs_rel):       
+    return df['agr_cat_' + abs_rel].map(agr_colors)
 
 
 def plot_agr(st, y0, y1, abs_rel):
@@ -173,6 +174,7 @@ def plot_agr(st, y0, y1, abs_rel):
 class Map:
     def __init__(self, click_callback=None):
         self.widget = leaflet.Map(center=(40, -95), zoom=4)
+        self.widget.add_control(leaflet.LegendControl(agr_colors, position='topright'))
         if click_callback is None:
             self.click_callback = self.dummy_callback
         else:
@@ -205,7 +207,7 @@ class Map:
         # proposed fix: https://github.com/jupyter-widgets/ipyleaflet/pull/786
         gdf = self.area_gdf(st, y0, y1, abs_rel)
         layer = leaflet.GeoJSON(data=json.loads(gdf.to_json()),
-                        style={'stroke': False, 'fillOpacity': 0.5},
+                        style={'stroke': False, 'fillOpacity': 0.6},
                         hover_style={'stroke': True},
                         style_callback=self.area_style)
         layer.on_click(self.click_callback)
