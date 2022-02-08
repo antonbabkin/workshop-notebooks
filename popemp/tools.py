@@ -13,7 +13,6 @@ import yaml
 import requests
 import nbconvert
 import nbformat
-
 import mkdocs.config, mkdocs.commands.build
 
 
@@ -35,7 +34,7 @@ class Nbd:
     def _locate_root_path(self):
         # call stack: 0=this function, 1=__init__(), 2=caller
         caller = inspect.stack()[2].filename
-        if any(x in caller for x in ['<ipython-input', '/xpython_', '/ipykernel_', '<stdin>']):
+        if any(x in caller for x in ['<ipython-input', 'xpython_', 'ipykernel_', '<stdin>']):
             # class initialized from interactive shell or notebook
             p0 = '.'
         else:
@@ -56,10 +55,10 @@ class Nbd:
         if link.exists():
             assert link.is_symlink(), f'Symbolic link expected at "{link.absolute()}".'
         else:
-            to = f'../{self.pkg_name}'
+            to = Path(f'../{self.pkg_name}')
             link.symlink_to(to, target_is_directory=True)
             link = link.absolute().relative_to(self.root)
-            to = Path(to).resolve().relative_to(self.root)
+            to = to.resolve().relative_to(self.root)
             print(f'Creating symbolic link "{link}" -> "{to}"')
             
         os.chdir(cur_dir)
