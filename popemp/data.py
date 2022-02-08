@@ -40,6 +40,28 @@ def geo():
     return df
 
 
+def pop_2010_2019():
+    f = download_file('https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/counties/totals/co-est2019-alldata.csv', data_dir)
+    cols = ['STATE', 'COUNTY'] + [f'POPESTIMATE{y}' for y in range(2010, 2020)]
+    df = pd.read_csv(f, encoding='ISO-8859-1', dtype='str', usecols=cols)
+    df = pd.wide_to_long(df, 'POPESTIMATE', ['STATE', 'COUNTY'], 'year')
+    df = df.reset_index().rename(columns={'STATE': 'st', 'COUNTY': 'cty', 'POPESTIMATE': 'pop'})
+    df['pop'] = df['pop'].astype('int')
+    return df
+
+
+def pop_2000_2009():
+    f = download_file('https://www2.census.gov/programs-surveys/popest/datasets/2000-2010/intercensal/county/co-est00int-tot.csv', data_dir)
+    cols = ['STATE', 'COUNTY'] + [f'POPESTIMATE{y}' for y in range(2000, 2010)]
+    df = pd.read_csv(f, encoding='ISO-8859-1', dtype='str', usecols=cols)
+    df = pd.wide_to_long(df, 'POPESTIMATE', ['STATE', 'COUNTY'], 'year')
+    df = df.reset_index().rename(columns={'STATE': 'st', 'COUNTY': 'cty', 'POPESTIMATE': 'pop'})
+    df['st'] = df['st'].str.pad(2, fillchar='0')
+    df['cty'] = df['cty'].str.pad(3, fillchar='0')
+    df['pop'] = df['pop'].astype('int')
+    return df
+
+
 def pop_1990_1999():
     f = download_file('https://www2.census.gov/programs-surveys/popest/tables/1990-2000/estimates-and-change-1990-2000/2000c8_00.txt', data_dir)
     with open(f, encoding='ISO-8859-1') as file:
@@ -69,28 +91,6 @@ def pop_1990_1999():
     df = df.reset_index()
     df['pop'] = pd.to_numeric(df['pop'].str.replace(',', '', regex=False)).astype('int')
 
-    return df
-
-
-def pop_2000_2009():
-    f = download_file('https://www2.census.gov/programs-surveys/popest/datasets/2000-2010/intercensal/county/co-est00int-tot.csv', data_dir)
-    cols = ['STATE', 'COUNTY'] + [f'POPESTIMATE{y}' for y in range(2000, 2010)]
-    df = pd.read_csv(f, encoding='ISO-8859-1', dtype='str', usecols=cols)
-    df = pd.wide_to_long(df, 'POPESTIMATE', ['STATE', 'COUNTY'], 'year')
-    df = df.reset_index().rename(columns={'STATE': 'st', 'COUNTY': 'cty', 'POPESTIMATE': 'pop'})
-    df['st'] = df['st'].str.pad(2, fillchar='0')
-    df['cty'] = df['cty'].str.pad(3, fillchar='0')
-    df['pop'] = df['pop'].astype('int')
-    return df
-
-
-def pop_2010_2019():
-    f = download_file('https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/counties/totals/co-est2019-alldata.csv', data_dir)
-    cols = ['STATE', 'COUNTY'] + [f'POPESTIMATE{y}' for y in range(2010, 2020)]
-    df = pd.read_csv(f, encoding='ISO-8859-1', dtype='str', usecols=cols)
-    df = pd.wide_to_long(df, 'POPESTIMATE', ['STATE', 'COUNTY'], 'year')
-    df = df.reset_index().rename(columns={'STATE': 'st', 'COUNTY': 'cty', 'POPESTIMATE': 'pop'})
-    df['pop'] = df['pop'].astype('int')
     return df
 
 

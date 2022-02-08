@@ -9,6 +9,7 @@ from urllib.parse import urlparse
 from pathlib import Path
 import io
 
+import yaml
 import requests
 import nbconvert
 import nbformat
@@ -27,6 +28,7 @@ class Nbd:
         assert p.exists() and p.is_dir()
         self._make_symlinks()
         
+        self._make_docs_dirs()
         self.docs_config = mkdocs.config.load_config((self.root/'mkdocs.yml').open())
         self.docs_path = Path(self.docs_config['docs_dir'])
         
@@ -58,9 +60,24 @@ class Nbd:
             link.symlink_to(to, target_is_directory=True)
             link = link.absolute().relative_to(self.root)
             to = Path(to).resolve().relative_to(self.root)
-            print(f'Symbolic link created "{link}" -> "{to}"')
+            print(f'Creating symbolic link "{link}" -> "{to}"')
+            
         os.chdir(cur_dir)
+        
+    def _make_docs_dirs(self):
+        docs_conf = yaml.safe_load(open(self.root/'mkdocs.yml'))
+        
+        d = self.root / docs_conf['docs_dir']
+        if not d.exists():
+            print(f'Creating directory "{d.relative_to(self.root)}"')
+        d.mkdir(exist_ok=True)
 
+        d = self.root / docs_conf['site_dir']
+        if not d.exists():
+            print(f'Creating directory "{d.relative_to(self.root)}"')
+        d.mkdir(exist_ok=True)
+        
+        
     def nb2mod(self, nb_rel_path):
         """`nb_rel_path` is relative to project's notebook directory."""
         nb_rel_path = Path(nb_rel_path)

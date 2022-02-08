@@ -9,10 +9,12 @@ import matplotlib.pyplot as plt
 import ipywidgets as widgets
 import ipyleaflet as leaflet
 
+from .tools import Nbd
 from . import data
+nbd = Nbd('popemp')
+
 
 DF = {}
-
 
 def prep_data():
     DF['geo'] = data.geo()
@@ -53,9 +55,10 @@ def plot_growth(st, cty, y0, y1):
 
     a = ax[0]
     a.set_title(f'Pop and emp index, {y0} = 100 (dotted {reference})')
-    lines = a.plot(d.index, d[['pop_idx', 'emp_idx']])
-    a.plot(d0.index, d0['pop_idx'], ls=':', c=lines[0].get_color())
-    a.plot(d0.index, d0['emp_idx'], ls=':', c=lines[1].get_color())
+    l_pop = a.plot(d.index, d['pop_idx'])[0]
+    l_emp = a.plot(d.index, d['emp_idx'])[0]
+    a.plot(d0.index, d0['pop_idx'], ls=':', c=l_pop.get_color())
+    a.plot(d0.index, d0['emp_idx'], ls=':', c=l_emp.get_color())
     a.set_xticks(d.index)
     a.set_xticks([], minor=True)
     a.grid(True)

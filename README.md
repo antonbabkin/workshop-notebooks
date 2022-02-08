@@ -1,6 +1,7 @@
 # Literate programming and interactive reporting with Jupyter notebooks
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/antonbabkin/workshop-notebooks/HEAD?urlpath=lab)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/antonbabkin/workshop-notebooks/HEAD?urlpath=lab) |
+[Documentation](https://antonbabkin.github.io/workshop-notebooks/) |
 [Dashboard](https://mybinder.org/v2/gh/antonbabkin/workshop-notebooks/HEAD?urlpath=voila%2Frender%2Fnbs%2Fdashboard.ipynb)
 
 Workshop materials for the [2022 Data Science Research Bazaar](https://datascience.wisc.edu/data-science-research-bazaar/) at UW-Madison.
