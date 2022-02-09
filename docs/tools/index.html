@@ -88,18 +88,27 @@
             
             <li class="nav-item" data-level="1"><a href="#nbd-development-in-the-notebook" class="nav-link">NBD: development in the notebook</a>
               <ul class="nav flex-column">
-            <li class="nav-item" data-level="2"><a href="#turn-notebooks-into-importable-python-package" class="nav-link">turn notebooks into importable Python package</a>
+              </ul>
+            </li>
+            
+            <li class="nav-item" data-level="1"><a href="#notebooks-and-git" class="nav-link">Notebooks and Git</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#manually-clear-output" class="nav-link">Manually clear output</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-level="2"><a href="#documentation" class="nav-link">documentation</a>
+            <li class="nav-item" data-level="2"><a href="#automated-clearing" class="nav-link">Automated clearing</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#do-not-store-notebooks-in-git" class="nav-link">Do not store notebooks in Git :)</a>
               <ul class="nav flex-column">
               </ul>
             </li>
               </ul>
             </li>
             
-            <li class="nav-item" data-level="1"><a href="#file-download" class="nav-link">File download</a>
+            <li class="nav-item" data-level="1"><a href="#misc" class="nav-link">Misc</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -114,12 +123,42 @@
                     <div class="col-md-9" role="main">
 
 <h1 id="tools-and-utilities">Tools and utilities</h1>
+<p>This notebook contains general purpose tools that are used throughout the project and might also be useful outside.</p>
 <h1 id="nbd-development-in-the-notebook">NBD: development in the notebook</h1>
-<h2 id="turn-notebooks-into-importable-python-package">turn notebooks into importable Python package</h2>
-<h2 id="documentation">documentation</h2>
-<p><a href="https://www.mkdocs.org">MkDocs</a></p>
-<h1 id="file-download">File download</h1>
-<p>Example usage: download LICENSE file from GitHub repo and assert that it's contents is the same as in the local repo version.</p>
+<p>This section defines the <code>Nbd</code> class that can be used to convert a notebook into a script or a documentation page. This approach was greatly inspired by the <a href="https://github.com/fastai/nbdev">nbdev</a> project and can be thought of as a reduced and simplified <code>nbdev</code>.</p>
+<p><img alt="nbd cells" src="../img/tools_nbd.svg" /></p>
+<p>To use <code>Nbd</code>, create an instance with the name of your package and call methods from that instance like so: <code>nbd = Nbd('popemp')</code>.</p>
+<p>Method <code>Nbd.nb2mod()</code> selectively exports code cells into a script, making it easily importable in other parts of the project and also leaving out scratch and exploratory code. To mark code cell for export to a module, put <code>#nbd module</code> in the first line of the cell. All imports from project modules into notebooks should take absolute form <code>from ... import ...</code>, they will be automatically converted to relative import in scripts. For example, <code>from popemp.tools import Nbd</code> will become <code>from .tools import Nbd</code>.</p>
+<p>Turning notebook into a documentation page takes two steps. First, notebook is converted to a Markdown file in <code>docs_src/</code> folder, and then all Markdown files are turned into a searchable HTML website in <code>docs/</code> folder using <a href="https://www.mkdocs.org">MkDocs</a> utility. To mark code cell for documentation, put <code>#nbd docs</code> in the first line of the cell. It can also be <code>#nbd module docs</code> if cell goes both to module and documentation. To mark markdown cells, add <code>[nbd]: # "docs"</code> in the first line of the cell. Method <code>Nbd.build_docs()</code> performs both steps for each notebook specified in the <code>mkdocs.yml</code> file at project root. This file can be also used to configure site structure. Site is stored in <code>docs/</code> folder and pushed to GitHub, so it can be easily hosted as GitHub pages (enable in GitHub repo settings). Check MkDocs documentation for configuration options and other deployment alternatives.</p>
+<p>Example and testing of <code>Nbd</code>.</p>
+<pre><code class="language-python">nbd = Nbd('popemp')
+print(f'Project root directory: &quot;{nbd.root}&quot;')
+</code></pre>
+<pre><code>Project root directory: "/Users/anton/work/workshop-notebooks"
+</code></pre>
+<h1 id="notebooks-and-git">Notebooks and Git</h1>
+<p>Jupyter notebooks are technically JSON files with possibly embedded binary data in output cells (e.g. images). This make them not very Git friendly, because most Git tools are designed to work with plain text files. Git diffs of notebooks are not very readable, merges break notebooks, and binary blobs clog storage and don't diff or merge. Multiple approaches exist to address these problems, and we won't cover them here, but here are some options that you can try and see what works best for you.</p>
+<h2 id="manually-clear-output">Manually clear output</h2>
+<p>Before commiting a notebook to git, right click it in JupyterLab, select "Clear All Outputs" and save. This is a very simple approach that I have used in the past. It solves the issue of embedded binary data and some execution counters. Yet a lot of notebook and cell metadata will still remain. And sometimes you will forget to clear before committing. :)</p>
+<h2 id="automated-clearing">Automated clearing</h2>
+<p>You can configure Git to automatically run clearing operations when you commit notebooks. Several tools can do this, for example <a href="https://github.com/choldgraf/nbclean">nbclean</a>, <a href="https://github.com/kynan/nbstripout">nbstripout</a>, <a href="https://github.com/fastai/nbdev">nbdev</a> and even standard <a href="https://github.com/jupyter/nbconvert">nbconvert</a> that comes together with Jupyter installation.</p>
+<p>I am using <code>nbconvert</code> for clearing and <a href="https://github.com/jupyter/nbdime">nbdime</a> for diffing and merging. You need to configure Git like this.</p>
+<pre><code>nbdime config-git --enable
+git config filter.jupyternotebook.clean &quot;jupyter nbconvert --stdin --stdout --to=notebook --ClearOutputPreprocessor.enabled=True --ClearMetadataPreprocessor.enabled=True --log-level=ERROR&quot;
+git config filter.jupyternotebook.smudge cat
+git config filter.jupyternotebook.required true
+git config diff.jupyternotebook.command &quot;git-nbdiffdriver diff --ignore-outputs --ignore-metadata --ignore-details&quot;
+</code></pre>
+<p>For these filters to apply, notebooks should be registered in <code>.gitattributes</code> file.</p>
+<pre><code>*.ipynb filter=jupyternotebook
+*.ipynb diff=jupyternotebook
+*.ipynb merge=jupyternotebook
+</code></pre>
+<h2 id="do-not-store-notebooks-in-git">Do not store notebooks in Git :)</h2>
+<p>Well, not exactly. Notebooks are converted to plain text for Git storage and back for execution. This is an approach taken by the <a href="https://github.com/mwouts/jupytext">Jupytext</a> project. I have not used this myself, but want to try at some point.</p>
+<h1 id="misc">Misc</h1>
+<p><code>download_file()</code> takes URL, downloads file to specified location and returns it's path. Subsequent calls to the same function return cached copy from disk. We use this function to automate manual operations, to simplify replication and to allow pulling data into our cloud-hosted dashboard.</p>
+<p>Example: download LICENSE file from GitHub repo and assert that it's contents is the same as in the local repo version.</p>
 <pre><code class="language-python">nbd = Nbd('popemp')
 f = download_file('https://raw.githubusercontent.com/antonbabkin/workshop-notebooks/main/LICENSE', nbd.root, 'LICENSE_COPY')
 assert open(nbd.root/'LICENSE').read() == open(f).read()

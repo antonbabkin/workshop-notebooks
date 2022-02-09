@@ -83,10 +83,25 @@
             
             <li class="nav-item" data-level="1"><a href="#analysis-of-population-and-employment-dynamics" class="nav-link">Analysis of population and employment dynamics</a>
               <ul class="nav flex-column">
-            <li class="nav-item" data-level="2"><a href="#compare-different-areas" class="nav-link">Compare different areas</a>
+              </ul>
+            </li>
+            
+            <li class="nav-item" data-level="1"><a href="#dynamics-in-a-given-geographic-area" class="nav-link">Dynamics in a given geographic area</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#widgets" class="nav-link">Widgets</a>
               <ul class="nav flex-column">
               </ul>
             </li>
+              </ul>
+            </li>
+            
+            <li class="nav-item" data-level="1"><a href="#compare-different-areas" class="nav-link">Compare different areas</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            
+            <li class="nav-item" data-level="1"><a href="#map" class="nav-link">Map</a>
+              <ul class="nav flex-column">
               </ul>
             </li>
         </ul>
@@ -95,6 +110,15 @@
                     <div class="col-md-9" role="main">
 
 <h1 id="analysis-of-population-and-employment-dynamics">Analysis of population and employment dynamics</h1>
+<p>In this module we will combine economic, demographic and geographic data to explore patterns of population and employment dynamics across states and counties.</p>
+<p>Main dataframes are stored in a global dict <code>DF</code>. During interactive notebook execution it is populated as needed. If imported as a module, function <code>prep_data()</code> should be called before using other module functions.</p>
+<pre><code class="language-python">DF = {}
+
+def prep_data():
+    DF['geo'] = data.geo()
+    DF['by year'] = data_by_year()
+</code></pre>
+<p>In <code>data_by_year()</code> we simply merge employment and population dataframes available from <code>popemp.data</code> module.</p>
 <pre><code class="language-python">DF['by year'] = data_by_year()
 DF['by year'].head()
 </code></pre>
@@ -180,11 +204,62 @@ DF['by year'].head()
 </table>
 </div>
 
-<pre><code class="language-python">plot_growth('55', '025', 2005, 2015)
+<h1 id="dynamics-in-a-given-geographic-area">Dynamics in a given geographic area</h1>
+<p>Function <code>plot_growth(st, cty, y0, y1)</code> makes a plot with population and employment dynamic in a chosen geographic area. Level series are normalized to 100 in base year <code>y0</code>. Year-to-year growth rates are shown in a separate panel. For states and counties we also add lines for a bigger reference geography: states are compared to entire country, counties are compared to their state.</p>
+<p>We can see that Wisconsin population was growing slower than national, and that post-recession employment recovery was also slower.</p>
+<pre><code class="language-python">plot_growth('55', '000', 2005, 2015)
 </code></pre>
-<p><img alt="png" src="../img/analysis_output_2_0.png" /></p>
-<h2 id="compare-different-areas">Compare different areas</h2>
-<p>Average growth rate of variable <script type="math/tex">x_t</script> between years <script type="math/tex">s</script> and <script type="math/tex">t</script> is computed as <script type="math/tex">x_{agr} = \left(\frac{x_t}{x_s}\right)^{\frac{1}{t-s+1}}</script>.</p>
+<p><img alt="png" src="../img/analysis_output_8_0.png" /></p>
+<h2 id="widgets">Widgets</h2>
+<p>Jupyter <a href="https://ipywidgets.readthedocs.io">widgets</a> are like other Python objects such as strings, lists or pandas dataframes. Like other objects widgets also store their state, have methods to do something useful with that state and have a representation suitable for rich rendering in a HTML view of a Jupyter notebook. Additional feature of widgets is that their visual representation can be updated dynamically and they can respond to user interaction.</p>
+<p>Here is a simple slider. We can read it's value in code from another cell and also change it's value programmatically.</p>
+<pre><code class="language-python">w = widgets.IntSlider(value=4, min=0, max=10, description='How many?')
+w
+</code></pre>
+<pre><code>IntSlider(value=4, description='How many?', max=10)
+</code></pre>
+<pre><code class="language-python">print('He says', w.value)
+</code></pre>
+<pre><code>He says 4
+</code></pre>
+<pre><code class="language-python">w.value = 5
+</code></pre>
+<pre><code class="language-python">print('Now he says', w.value)
+</code></pre>
+<pre><code>Now he says 5
+</code></pre>
+<p>We can combine multiple widgets and make them do something useful together. A button here will add up two numbers and display result in a separate label widget. We can even be fancy and use <script type="math/tex">\LaTeX</script> in text labels.</p>
+<pre><code class="language-python"># create widgets
+wx = widgets.IntSlider(2, 0, 5, description='$x$')
+wy = widgets.IntSlider(2, 0, 5, description='$y$')
+wb = widgets.Button(description='Add')
+wz = widgets.Label('$x + y = ?$')
+
+# useful function
+def how_many(x, y):
+    z = x + y
+    return 5
+
+def click_handler(*args):
+    # &quot;*args&quot; captures arguments passed from calling widget, but we ignore them here
+    x = wx.value
+    y = wy.value
+    z = how_many(x, y)
+    wz.value = f'${x} + {y} = {z}$'
+# run handler to fill initial values
+click_handler()
+# register handler with button widget
+wb.on_click(click_handler)
+
+# display widgets in a simple vertical layout
+widgets.VBox([wx, wy, wb, wz])
+</code></pre>
+<pre><code>VBox(children=(IntSlider(value=2, description='$x$', max=5), IntSlider(value=2, description='$y$', max=5), But…
+</code></pre>
+<p>Function <code>st_cty_selectors()</code> creates two dropdown widgets that can be used to select state and county using their names instead of codes, while codes are used internally to work with our dataframes. Lists of states and counties are populated from our global tables. Additional logic, wrapping inside of the function, updates list of counties dynamically every time the state is changed. We can now create a pair of linked widgets anywhere we need them later.</p>
+<h1 id="compare-different-areas">Compare different areas</h1>
+<p>We will now turn to comparing diffent areas in a cross-section. Function <code>compute_agr(y0, y1)</code> calculates average annual growth rate of population and employment in every area between <code>y0</code> and <code>y1</code>. Average growth rate of variable <script type="math/tex">x_t</script> between years <script type="math/tex">s</script> and <script type="math/tex">t</script> is calculated as <script type="math/tex">x_{agr} = \left(\frac{x_t}{x_s}\right)^{\frac{1}{t-s+1}}</script>. Every area is also labelled according as <code>pop+ emp+</code>, <code>pop+ emp-</code>, <code>pop- emp+</code> and <code>pop- emp-</code> using two growth measures: absolute percentage growth and relative to reference geographic area.</p>
+<p><code>color_from_agr_cat(df, abs_rel)</code> returns a column of HEX color codes useful for plotting.</p>
 <pre><code class="language-python">d = compute_agr(2000, 2010)
 d['c'] = color_from_agr_cat(d, 'abs')
 d.head()
@@ -233,7 +308,7 @@ d.head()
       <td>0.000000</td>
       <td>pop+ emp-</td>
       <td>pop+ emp+</td>
-      <td>green</td>
+      <td>#1b9e77</td>
     </tr>
     <tr>
       <th>1</th>
@@ -247,7 +322,7 @@ d.head()
       <td>-0.323581</td>
       <td>pop+ emp-</td>
       <td>pop- emp-</td>
-      <td>green</td>
+      <td>#1b9e77</td>
     </tr>
     <tr>
       <th>2</th>
@@ -261,7 +336,7 @@ d.head()
       <td>1.043393</td>
       <td>pop+ emp+</td>
       <td>pop+ emp+</td>
-      <td>red</td>
+      <td>#d95f02</td>
     </tr>
     <tr>
       <th>3</th>
@@ -275,7 +350,7 @@ d.head()
       <td>1.362352</td>
       <td>pop+ emp+</td>
       <td>pop+ emp+</td>
-      <td>red</td>
+      <td>#d95f02</td>
     </tr>
     <tr>
       <th>4</th>
@@ -289,15 +364,19 @@ d.head()
       <td>-3.057192</td>
       <td>pop- emp-</td>
       <td>pop- emp-</td>
-      <td>blue</td>
+      <td>#7570b3</td>
     </tr>
   </tbody>
 </table>
 </div>
 
+<p>As with dynamics plot, <code>plot_agr(st, y0, y1, abs_rel)</code> can be used to generate figures with state or county average growth rates as a scatterplot.</p>
 <pre><code class="language-python">plot_agr('55', 2005, 2015, 'rel')
 </code></pre>
-<p><img alt="png" src="../img/analysis_output_5_0.png" /></p></div>
+<p><img alt="png" src="../img/analysis_output_20_0.png" /></p>
+<h1 id="map">Map</h1>
+<p>Python package <a href="https://ipyleaflet.readthedocs.io">ipyleaflet</a> is a wrapper around <code>Leaflet.js</code> and can generate customizable maps. Map objects are also Jupyter widgets, and so we can mix and match them with all other widgets and layout.</p>
+<p>It is helpful to wrap map widget in a class <code>Map</code> that stores map state and exposes interaction via <code>click_callback</code> and <code>upd()</code> methods.</p></div>
             </div>
         </div>
 

@@ -37,7 +37,7 @@ Notice that Binder platform provides computational resources for free, and so li
 
 This method requires some experience or readiness to read documentation. As reward, you will have persistent environment under your control that does not depend on cloud service availability. This is also a typical way to set up Python for data work.
 
-1. Download and install latest [miniconda](https://docs.conda.io/en/latest/miniconda.html), following instructions for your operating system.
+1. Download and install latest [miniconda](https://docs.conda.io/en/latest/miniconda.html), following instructions for your operating system. Skip this step if you already have `conda` command line utility available in your terminal.
 
 2. Open terminal (Anaconda Prompt on Windows) and clone this repository in a folder of your choice (`git clone https://github.com/antonbabkin/workshop-notebooks.git`). Alternatively, [download](https://github.com/antonbabkin/workshop-notebooks/archive/refs/heads/main.zip) and unpack repository code as ZIP. If you want to practice building and hosting HTML documentation, you need to use a repository that you control. One way to do it is to fork this repository and then clone your copy.
 
