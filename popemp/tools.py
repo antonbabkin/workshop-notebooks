@@ -23,7 +23,7 @@ class Nbd:
         self.root = self._locate_root_path()
         p = self.pkg_path = self.root/pkg_name
         assert p.exists() and p.is_dir()
-        p = self.nbs_path = self.root/'nbs'
+        p = self.nbs_path = self.root/self.nbs_dir
         assert p.exists() and p.is_dir()
         self._make_symlinks()
         
@@ -134,7 +134,9 @@ class Nbd:
         return []
     
     def nb2doc(self, nb_rel_path):
-        """`nb_rel_path` is relative to project's notebook directory."""
+        """`nb_rel_path` is relative to project's notebook directory.
+        Does not copy ![]() images from markdown cells, those must be copied manually.
+        """
         nb_rel_path = Path(nb_rel_path)
         nb_path = self.nbs_path/nb_rel_path
         assert nb_path.exists() and nb_path.is_file(), f'Notebook not found at "{nb_path}".'
@@ -182,9 +184,6 @@ class Nbd:
         return line.replace(old, new)
 
     def build_docs(self):
-        print(f'Cleaning docs directory at "{self.docs_path.relative_to(self.root)}"...')
-        shutil.rmtree(self.docs_path)
-        self.docs_path.mkdir(parents=True, exist_ok=True)
         for item in self.docs_config['nav']:
             md_path = list(item.values())[0]
             assert isinstance(md_path, str) and md_path.endswith('.md'), md_path
