@@ -4,7 +4,7 @@
 [Documentation](https://antonbabkin.github.io/workshop-notebooks/) |
 [Dashboard](https://mybinder.org/v2/gh/antonbabkin/workshop-notebooks/HEAD?urlpath=voila%2Frender%2Fnbs%2Fdashboard.ipynb)
 
-Workshop materials for the [2022 Data Science Research Bazaar](https://datascience.wisc.edu/data-science-research-bazaar/) at UW-Madison.
+Workshop materials for the [2022 Data Science Research Bazaar](https://datascience.wisc.edu/data-science-research-bazaar/) at UW-Madison. Video recording available [here](https://www.youtube.com/watch?v=xWiLzdHSowk).
 
 This is an intermediate level workshop that will teach how to use Jupyter notebooks with Python for literate programming and interactive presentation of research results. I  walk participants through steps of a mini research project of visualizing geospatial data, focusing on tools and methods of making results accessible, reproducible and interactive. This workshop will use economic, demographic and geographic data characterizing US communities that are freely and publicly available from the US Census Bureau website.
 
