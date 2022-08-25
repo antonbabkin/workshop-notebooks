@@ -1,6 +1,8 @@
 .ipynb_checkpoints
 *.pyc
 
+*.ipynb
+
 nbs/popemp
 data
 docs_src
