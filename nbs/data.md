@@ -30,9 +30,8 @@ format:
 In this module we download, process and store geographic shapes, population and employment data from US Census Bureau.
 
 ```{code-cell} ipython3
-:tags: []
+:tags: [nbd-module]
 
-#nbd module
 import io
 
 import numpy as np
@@ -55,9 +54,8 @@ We need state and county FIPS codes and names, and their shapes for map visualiz
 Function `geo()` downloads state and county 1:20,000,000 shapefiles using [geopandas](https://geopandas.org) library, reshapes and combines them into single a GeoDataFrame. We use county code `"000"` as indicator of state rows. Resulting dataframe is cached on disk as a binary `pickle` file, and when subsequent calls of `geo()` will simply read and return the dataframe from cache to save time and avoid work. Delete `data/geo.pkl` if you want to re-create the dataframe, for example, after you changed the function. Similarly, `download_file()` also caches files on disk.
 
 ```{code-cell} ipython3
-:tags: []
+:tags: [nbd-module]
 
-#nbd module
 def geo():
     df_file = data_dir/'geo.pkl'
     if df_file.exists():
@@ -127,9 +125,8 @@ Note on [character encoding](https://www.census.gov/programs-surveys/geography/t
 Post-2000 files are simple CSV tables. Functions `pop_2010_2019()` and `pop_2000_2009()` download and read them into dataframes with minor manipulation.
 
 ```{code-cell} ipython3
-:tags: []
+:tags: [nbd-module]
 
-#nbd module
 def pop_2010_2019():
     f = download_file('https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/counties/totals/co-est2019-alldata.csv', data_dir)
     cols = ['STATE', 'COUNTY'] + [f'POPESTIMATE{y}' for y in range(2010, 2020)]
@@ -141,9 +138,8 @@ def pop_2010_2019():
 ```
 
 ```{code-cell} ipython3
-:tags: []
+:tags: [nbd-module]
 
-#nbd module
 def pop_2000_2009():
     f = download_file('https://www2.census.gov/programs-surveys/popest/datasets/2000-2010/intercensal/county/co-est00int-tot.csv', data_dir)
     cols = ['STATE', 'COUNTY'] + [f'POPESTIMATE{y}' for y in range(2000, 2010)]
@@ -161,9 +157,8 @@ def pop_2000_2009():
 1990-1999 data are in a long text file. `pop_1990_1999()` does some more elaborate parsing. Table with state and county population has `"1"` as the first character in every line. We use this to read necessary lines into a temporary string buffer, and then parse the buffer into a dataframe.
 
 ```{code-cell} ipython3
-:tags: []
+:tags: [nbd-module]
 
-#nbd module
 def pop_1990_1999():
     f = download_file('https://www2.census.gov/programs-surveys/popest/tables/1990-2000/estimates-and-change-1990-2000/2000c8_00.txt', data_dir)
     with open(f, encoding='ISO-8859-1') as file:
@@ -201,9 +196,8 @@ def pop_1990_1999():
 Finally, in `pop()` we call the three above functions to create three frames, combine them and add aggregated rows of national totals with state code `"00"` and county code `"000"`. We also compute year-to-year growth rate in percentage points in column `pop_gr`. Final dataframe is pickled for easy access.
 
 ```{code-cell} ipython3
-:tags: []
+:tags: [nbd-module]
 
-#nbd module
 def pop():
     df_file = data_dir/'pop.pkl'
     if df_file.exists():
@@ -263,9 +257,8 @@ State and county employment comes from Census Business Dynamics Statistics ([BDS
 Data does not require much processing which is done in the `emp()`. National, state and county tables are downloaded and combined, again using convention of setting state to `"00"` for national and county to `"000"` for national and state rows. Percentage year-to-year growth rate is renamed from `net_job_creation_rate` to `emp_gr`. Data goes back to 1978, but we only need from 1990 for combination with population.
 
 ```{code-cell} ipython3
-:tags: []
+:tags: [nbd-module]
 
-#nbd module
 def emp():
     df_file = data_dir/'emp.pkl'
     if df_file.exists():

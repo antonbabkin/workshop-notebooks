@@ -30,9 +30,8 @@ format:
 This notebook contains general purpose tools that are used throughout the project and might also be useful outside.
 
 ```{code-cell} ipython3
-:tags: []
+:tags: [nbd-module]
 
-#nbd module
 import os
 import sys
 import re
@@ -57,15 +56,14 @@ This section defines the `Nbd` class that can be used to convert a notebook into
 
 To use `Nbd`, create an instance with the name of your package and call methods from that instance like so: `nbd = Nbd('popemp')`.
 
-Method `Nbd.nb2mod()` selectively exports code cells into a script, making it easily importable in other parts of the project and also leaving out scratch and exploratory code. To mark code cell for export to a module, put `#nbd module` in the first line of the cell. All imports from project modules into notebooks should take absolute form `from ... import ...`, they will be automatically converted to relative import in scripts. For example, `from popemp.tools import Nbd` will become `from .tools import Nbd`.
+Method `Nbd.nb2mod()` selectively exports code cells into a script, making it easily importable in other parts of the project and also leaving out scratch and exploratory code. To mark code cell for export to a module, give it a `nbd-module` tag. All imports from project modules into notebooks should take absolute form `from ... import ...`, they will be automatically converted to relative import in scripts. For example, `from popemp.tools import Nbd` will become `from .tools import Nbd`.
 
 Turning notebook into a documentation page is done with Quarto.
 TODO: finish this paragraph.
 
 ```{code-cell} ipython3
-:tags: []
+:tags: [nbd-module]
 
-#nbd module
 class Nbd:
     def __init__(self, pkg_name):
         self.pkg_name = pkg_name
@@ -109,22 +107,24 @@ class Nbd:
             
         os.chdir(cur_dir)
 
-        
     def nb2mod(self, nb_rel_path):
         """`nb_rel_path` is relative to project's notebook directory."""
         nb_rel_path = Path(nb_rel_path)
         nb_path = self.nbs_path/nb_rel_path
         assert nb_path.exists() and nb_path.is_file(), f'Notebook not found at "{nb_path}".'
         nb = nbformat.read(nb_path, nbformat.current_nbformat)
-        nb.cells = [c for c in nb.cells if (c.cell_type == 'code') and ('module' in self.get_cell_flags(c))]
+        
+        # only keep cells with "nbd-module" tag
+        nb.cells = [c for c in nb.cells 
+                    if ('tags' in c.metadata) and ('nbd-module' in c.metadata.tags)]
+        
         exporter = nbconvert.exporters.PythonExporter(exclude_input_prompt=True)
         script, _ = exporter.from_notebook_node(nb)
         mod_path = self.pkg_path/nb_rel_path.with_suffix('.py')
         
-        # remove #nbd lines, convert abs to rel imports
+        # convert abs to rel imports
         script = '\n'.join(self._relative_import(l, mod_path.relative_to(self.root))
-                           for l in script.split('\n')
-                           if not l.startswith('#nbd'))
+                           for l in script.split('\n'))
         
         mod_path.parent.mkdir(parents=True, exist_ok=True)
         mod_path.write_text(script)
@@ -156,21 +156,11 @@ class Nbd:
         dots = '.' * (len(path_parts) - common_len)
         rel_mod = dots + '.'.join(mod_parts[common_len:])
         return f'{indent}from {rel_mod} import {obj}'
-
-    @staticmethod
-    def get_cell_flags(cell):
-        first_line = cell.source.split('\n', 1)[0].strip()
-        if cell.cell_type == 'code' and first_line.startswith('#nbd'):
-            return first_line.split()[1:]
-        if cell.cell_type == 'markdown' and first_line.startswith('[nbd]:'):
-            return first_line.split('"')[1].split()
-        return []
-    
 ```
 
 +++ {"tags": ["nbd-docs"]}
 
-Example and testing of `Nbd`.
+Example and testing of `Nbd` root dir finder.
 
 ```{code-cell} ipython3
 :tags: [nbd-docs]
@@ -184,7 +174,8 @@ print(f'Project root directory: "{nbd.root}"')
 # Documentation filtering
 
 ```{code-cell} ipython3
-#nbd module
+:tags: [nbd-module]
+
 def filter_docs():
     """Only keep cells with "nbd-docs" tag."""
     nb = nbformat.reads(sys.stdin.read(), as_version=nbformat.NO_CONVERT)
@@ -209,7 +200,8 @@ Jupyter notebooks are technically JSON files with possibly embedded binary data 
 `download_file()` takes URL, downloads file to specified location and returns it's path. Subsequent calls to the same function return cached copy from disk. We use this function to automate manual operations, to simplify replication and to allow pulling data into our cloud-hosted dashboard.
 
 ```{code-cell} ipython3
-#nbd module
+:tags: [nbd-module]
+
 def download_file(url, dir=None, fname=None, overwrite=False, verbose=True):
     """Download file from given `url` and put it into `dir`.
     Current working directory is used as default. Missing directories are created.
@@ -258,9 +250,8 @@ f.unlink()
 # CLI interface
 
 ```{code-cell} ipython3
-:tags: []
+:tags: [nbd-module]
 
-#nbd module
 if __name__ == '__main__':
     if sys.argv[1] == 'filter-docs':
         filter_docs()

@@ -58,22 +58,24 @@ class Nbd:
             
         os.chdir(cur_dir)
 
-        
     def nb2mod(self, nb_rel_path):
         """`nb_rel_path` is relative to project's notebook directory."""
         nb_rel_path = Path(nb_rel_path)
         nb_path = self.nbs_path/nb_rel_path
         assert nb_path.exists() and nb_path.is_file(), f'Notebook not found at "{nb_path}".'
         nb = nbformat.read(nb_path, nbformat.current_nbformat)
-        nb.cells = [c for c in nb.cells if (c.cell_type == 'code') and ('module' in self.get_cell_flags(c))]
+        
+        # only keep cells with "nbd-module" tag
+        nb.cells = [c for c in nb.cells 
+                    if ('tags' in c.metadata) and ('nbd-module' in c.metadata.tags)]
+        
         exporter = nbconvert.exporters.PythonExporter(exclude_input_prompt=True)
         script, _ = exporter.from_notebook_node(nb)
         mod_path = self.pkg_path/nb_rel_path.with_suffix('.py')
         
-        # remove #nbd lines, convert abs to rel imports
+        # convert abs to rel imports
         script = '\n'.join(self._relative_import(l, mod_path.relative_to(self.root))
-                           for l in script.split('\n')
-                           if not l.startswith('#nbd'))
+                           for l in script.split('\n'))
         
         mod_path.parent.mkdir(parents=True, exist_ok=True)
         mod_path.write_text(script)
@@ -105,16 +107,6 @@ class Nbd:
         dots = '.' * (len(path_parts) - common_len)
         rel_mod = dots + '.'.join(mod_parts[common_len:])
         return f'{indent}from {rel_mod} import {obj}'
-
-    @staticmethod
-    def get_cell_flags(cell):
-        first_line = cell.source.split('\n', 1)[0].strip()
-        if cell.cell_type == 'code' and first_line.startswith('#nbd'):
-            return first_line.split()[1:]
-        if cell.cell_type == 'markdown' and first_line.startswith('[nbd]:'):
-            return first_line.split('"')[1].split()
-        return []
-    
 
 
 def filter_docs():

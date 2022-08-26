@@ -6,6 +6,7 @@ import io
 import numpy as np
 import pandas as pd
 import geopandas
+import matplotlib.pyplot as plt
 
 from .tools import Nbd, download_file
 
@@ -114,7 +115,7 @@ def pop():
     df['pop_gr'] = df.eval('(pop / pop_ - 1) * 100')
     del df['pop_']
 
-    df = df.sort_values(['st', 'cty', 'year'])
+    df = df.sort_values(['st', 'cty', 'year']).reset_index()
     df = df[['st', 'cty', 'year', 'pop', 'pop_gr']]
 
     df.to_pickle(df_file)
@@ -142,12 +143,13 @@ def emp():
     f = download_file('https://www2.census.gov/programs-surveys/bds/tables/time-series/bds2019_cty.csv', data_dir)
     df = pd.read_csv(f, usecols=['year', 'st', 'cty', 'emp', 'net_job_creation_rate'], dtype='str')
 
-    df = pd.concat([d1, d2, df], ignore_index=True)
+    df = pd.concat([d1, d2, df])
     df = df.rename(columns={'net_job_creation_rate': 'emp_gr'})
     df['year'] = df['year'].astype('int16')
     df['emp'] = pd.to_numeric(df['emp'], 'coerce')
     df['emp_gr'] = pd.to_numeric(df['emp_gr'], 'coerce')
     df = df[['st', 'cty', 'year', 'emp', 'emp_gr']]
+    df = df.query('year >= 1990').reset_index(drop=True)
     
     df.to_pickle(df_file)
     return df
