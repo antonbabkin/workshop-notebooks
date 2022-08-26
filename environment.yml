@@ -4,11 +4,10 @@ channels:
 dependencies:
   - python=3.9
   - jupyterlab>=3
+  - jupytext
   - geopandas
   - matplotlib
   - ipywidgets
   - ipyleaflet
-  - nbdime
+  - folium
   - voila
-  - mkdocs
-  - python-markdown-math

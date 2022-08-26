@@ -4,8 +4,8 @@ project:
     - tools.ipynb
     - data.ipynb
     - analysis.ipynb
-  post-render: touch _site/.nojekyll
-
+  # post-render: touch _site/.nojekyll
+  
 website:
   title: "Notebook Imperialism"
   navbar:

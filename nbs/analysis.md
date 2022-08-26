@@ -414,15 +414,65 @@ widgets.VBox([
     o])
 ```
 
++++ {"tags": ["nbd-docs"]}
+
+## Static interactivity with Plotly
+
+One big downside of widgets is that they require a running Jupyter kernel to fully function. This means that interactivity will be unavailable if you share your notebook as a static HTML page, and you need some kind of server solution such as Binder to share your interactive reports. Some tools, however, generate interactive output with all dependencies and data embedded in the HTML page itself, and can thus be hosted as a static page. [Plotly](https://plotly.com/python) is one such tool that can be used to create figures that users can interact with.
+
+```{code-cell} ipython3
+:tags: [nbd-docs]
+
+import plotly.express as px
+import plotly.io as pio
+pio.renderers.default = 'plotly_mimetype+notebook_connected'
+
+df = compute_agr(2005, 2015).query('st == "55"')
+df = df.merge(pd.DataFrame(DF['geo'].query('st == "55"')[['st', 'cty', 'name']]), 'left')
+
+fig = px.scatter(df, x='pop_agr_rel', y='emp_agr_rel', color='agr_cat_rel', hover_name='name', height=600, width=600)
+fig.update_layout()
+fig.show()
+```
+
 If only we could show all these dots on a map...
 
 +++ {"tags": ["nbd-docs"]}
 
 # Map
 
-Python package [ipyleaflet](https://ipyleaflet.readthedocs.io) is a wrapper around `Leaflet.js` and can generate customizable maps. Map objects are also Jupyter widgets, and so we can mix and match them with all other widgets and layout.
+## folium
 
-It is helpful to wrap map widget in a class `Map` that stores map state and exposes interaction via `click_callback` and `upd()` methods.
+Python package [`folium`](https://python-visualization.github.io/folium/index.html) is a wrapper around a popular JavaScript map visualization library `Leaflet.js`. Maps created with `folium` are static and can be included into HTML documentation for some degree of interactivity. `folium` is conveniently exposed in `geopandas.GeoDataFrame.explore()` method.
+
+```{code-cell} ipython3
+:tags: [nbd-module]
+
+def area_gdf(st, y0, y1, abs_rel):
+    if st == '00':
+        df = DF['geo'].query('cty == "000"')
+    else:
+        df = DF['geo'].query('st == @st')
+
+    df = df.merge(compute_agr(y0, y1))
+    df['color'] = color_from_agr_cat(df, abs_rel)
+    return df
+```
+
+```{code-cell} ipython3
+:tags: [nbd-docs]
+
+df = area_gdf('55', 2005, 2015, 'abs')
+df.explore(color='color')
+```
+
++++ {"tags": ["nbd-docs"]}
+
+## ipyleaflet
+
+Python package [`ipyleaflet`](https://ipyleaflet.readthedocs.io) is also a `Leaflet.js` wrapper. The main difference from `folium` is that map objects are Jupyter widgets that can be used for bidirectional interactivity and also combined with all other widgets.
+
+Here we wrap a map widget in a class `Map` that stores map state and exposes interaction via `click_callback` and `upd()` methods.
 
 ```{code-cell} ipython3
 :tags: [nbd-module]
@@ -441,14 +491,8 @@ class Map:
         pass
 
     @staticmethod
-    def area_gdf(st, y0, y1, abs_rel):
-        if st == '00':
-            df = DF['geo'].query('cty == "000"')
-        else:
-            df = DF['geo'].query('st == @st')
-
-        df = df.merge(compute_agr(y0, y1))
-        df['color'] = color_from_agr_cat(df, abs_rel)
+    def _area_gdf(st, y0, y1, abs_rel):
+        df = area_gdf(st, y0, y1, abs_rel)
         df = df[['st', 'cty', 'name', 'geometry', 'color']]
         return df
     
@@ -461,7 +505,7 @@ class Map:
         # ipyleaflet.GeoData is a natural choice for area layer, but it does not support style_callback()
         # so we use ipyleaflet.GeoJSON instead
         # proposed fix: https://github.com/jupyter-widgets/ipyleaflet/pull/786
-        gdf = self.area_gdf(st, y0, y1, abs_rel)
+        gdf = self._area_gdf(st, y0, y1, abs_rel)
         layer = leaflet.GeoJSON(data=json.loads(gdf.to_json()),
                         style={'stroke': False, 'fillOpacity': 0.6},
                         hover_style={'stroke': True},
