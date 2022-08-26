@@ -12,8 +12,20 @@ kernelspec:
   name: python3
 ---
 
-[nbd]: # "docs"
-# Analysis of population and employment dynamics
+```{raw-cell}
+:tags: []
+
+---
+title: "Analysis of population and employment dynamics"
+format:
+  html: 
+    code-fold: true
+    ipynb-filters:
+      - popemp/tools.py filter-docs
+---
+```
+
++++ {"tags": ["nbd-docs"]}
 
 In this module we will combine economic, demographic and geographic data to explore patterns of population and employment dynamics across states and counties.
 
@@ -32,11 +44,14 @@ from popemp import data
 nbd = Nbd('popemp')
 ```
 
-[nbd]: # "docs"
++++ {"tags": ["nbd-docs"]}
+
 Main dataframes are stored in a global dict `DF`. During interactive notebook execution it is populated as needed. If imported as a module, function `prep_data()` should be called before using other module functions.
 
 ```{code-cell} ipython3
-#nbd module docs
+:tags: [nbd-docs]
+
+#nbd module
 DF = {}
 
 def prep_data():
@@ -48,7 +63,8 @@ def prep_data():
 DF['geo'] = data.geo()
 ```
 
-[nbd]: # "docs"
++++ {"tags": ["nbd-docs"]}
+
 In `data_by_year()` we simply merge employment and population dataframes available from `popemp.data` module.
 
 ```{code-cell} ipython3
@@ -59,12 +75,14 @@ def data_by_year():
 ```
 
 ```{code-cell} ipython3
-#nbd docs
+:tags: [nbd-docs]
+
 DF['by year'] = data_by_year()
 DF['by year'].head()
 ```
 
-[nbd]: # "docs"
++++ {"tags": ["nbd-docs"]}
+
 # Dynamics in a given geographic area
 
 +++
@@ -75,7 +93,8 @@ Let's explore the data a little. I will pretend that I am seeing it for the firs
 # YOUR CODE GOES HERE
 ```
 
-[nbd]: # "docs"
++++ {"tags": ["nbd-docs"]}
+
 Function `plot_growth(st, cty, y0, y1)` makes a plot with population and employment dynamic in a chosen geographic area. Level series are normalized to 100 in base year `y0`. Year-to-year growth rates are shown in a separate panel. For states and counties we also add lines for a bigger reference geography: states are compared to entire country, counties are compared to their state.
 
 ```{code-cell} ipython3
@@ -128,15 +147,18 @@ def plot_growth(st, cty, y0, y1):
     return fig
 ```
 
-[nbd]: # "docs"
++++ {"tags": ["nbd-docs"]}
+
 We can see that Wisconsin population was growing slower than national, and that post-recession employment recovery was also slower.
 
 ```{code-cell} ipython3
-#nbd docs
+:tags: [nbd-docs]
+
 plot_growth('55', '000', 2005, 2015)
 ```
 
-[nbd]: # "docs"
++++ {"tags": ["nbd-docs"]}
+
 ## Widgets
 
 Jupyter [widgets](https://ipywidgets.readthedocs.io) are like other Python objects such as strings, lists or pandas dataframes. Like other objects widgets also store their state, have methods to do something useful with that state and have a representation suitable for rich rendering in a HTML view of a Jupyter notebook. Additional feature of widgets is that their visual representation can be updated dynamically and they can respond to user interaction.
@@ -144,31 +166,37 @@ Jupyter [widgets](https://ipywidgets.readthedocs.io) are like other Python objec
 Here is a simple slider. We can read it's value in code from another cell and also change it's value programmatically.
 
 ```{code-cell} ipython3
-#nbd docs
+:tags: [nbd-docs]
+
 w = widgets.IntSlider(value=4, min=0, max=10, description='How many?')
 w
 ```
 
 ```{code-cell} ipython3
-#nbd docs
+:tags: [nbd-docs]
+
 print('He says', w.value)
 ```
 
 ```{code-cell} ipython3
-#nbd docs
+:tags: [nbd-docs]
+
 w.value = 5
 ```
 
 ```{code-cell} ipython3
-#nbd docs
+:tags: [nbd-docs]
+
 print('Now he says', w.value)
 ```
 
-[nbd]: # "docs"
++++ {"tags": ["nbd-docs"]}
+
 We can combine multiple widgets and make them do something useful together. A button here will add up two numbers and display result in a separate label widget. We can even be fancy and use $\LaTeX$ in text labels.
 
 ```{code-cell} ipython3
-#nbd docs
+:tags: [nbd-docs]
+
 # create widgets
 wx = widgets.IntSlider(2, 0, 5, description='$x$')
 wy = widgets.IntSlider(2, 0, 5, description='$y$')
@@ -195,7 +223,8 @@ wb.on_click(click_handler)
 widgets.VBox([wx, wy, wb, wz])
 ```
 
-[nbd]: # "docs"
++++ {"tags": ["nbd-docs"]}
+
 Function `st_cty_selectors()` creates two dropdown widgets that can be used to select state and county using their names instead of codes, while codes are used internally to work with our dataframes. Lists of states and counties are populated from our global tables. Additional logic, wrapping inside of the function, updates list of counties dynamically every time the state is changed. We can now create a pair of linked widgets anywhere we need them later.
 
 ```{code-cell} ipython3
@@ -243,7 +272,8 @@ widgets.VBox([
     o])
 ```
 
-[nbd]: # "docs"
++++ {"tags": ["nbd-docs"]}
+
 # Compare different areas
 
 We will now turn to comparing diffent areas in a cross-section. Function `compute_agr(y0, y1)` calculates average annual growth rate of population and employment in every area between `y0` and `y1`. Average growth rate of variable $x_t$ between years $s$ and $t$ is calculated as $x_{agr} = \left(\frac{x_t}{x_s}\right)^{\frac{1}{t-s+1}}$. Every area is also labelled according as `pop+ emp+`, `pop+ emp-`, `pop- emp+` and `pop- emp-` using two growth measures: absolute percentage growth and relative to reference geographic area.
@@ -293,13 +323,15 @@ def color_from_agr_cat(df, abs_rel):
 ```
 
 ```{code-cell} ipython3
-#nbd docs
+:tags: [nbd-docs]
+
 d = compute_agr(2000, 2010)
 d['c'] = color_from_agr_cat(d, 'abs')
 d.head()
 ```
 
-[nbd]: # "docs"
++++ {"tags": ["nbd-docs"]}
+
 As with dynamics plot, `plot_agr(st, y0, y1, abs_rel)` can be used to generate figures with state or county average growth rates as a scatterplot.
 
 ```{code-cell} ipython3
@@ -342,7 +374,8 @@ def plot_agr(st, y0, y1, abs_rel):
 ```
 
 ```{code-cell} ipython3
-#nbd docs
+:tags: [nbd-docs]
+
 plot_agr('55', 2005, 2015, 'rel')
 ```
 
@@ -369,9 +402,8 @@ widgets.VBox([
 
 If only we could show all these dots on a map...
 
-+++
++++ {"tags": ["nbd-docs"]}
 
-[nbd]: # "docs"
 # Map
 
 Python package [ipyleaflet](https://ipyleaflet.readthedocs.io) is a wrapper around `Leaflet.js` and can generate customizable maps. Map objects are also Jupyter widgets, and so we can mix and match them with all other widgets and layout.

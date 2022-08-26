@@ -1,0 +1,27 @@
+project:
+  type: website
+  render:
+    - tools.ipynb
+    - data.ipynb
+    - analysis.ipynb
+  post-render: touch _site/.nojekyll
+
+website:
+  title: "Notebook Imperialism"
+  navbar:
+    background: primary
+    left:
+      - href: tools.ipynb
+        text: Tools
+      - href: data.ipynb
+        text: Data
+      - href: analysis.ipynb
+        text: Analysis
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    toc: true
+
+
+

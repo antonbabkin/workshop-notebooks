@@ -90,10 +90,4 @@ nbd.nb2mod('analysis.ipynb')
 
 # Build documentation site
 
-Notebooks are converted to temporary Markdown files in `docs_src/`, and then full documentation site is built in `docs/` using MkDocs utility.
-
-```{code-cell} ipython3
-from popemp.tools import Nbd
-nbd = Nbd('popemp')
-nbd.build_docs()
-```
+TODO needs update

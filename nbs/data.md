@@ -12,8 +12,20 @@ kernelspec:
   name: python3
 ---
 
-[nbd]: # "docs"
-# Retrieve and prepare data
+```{raw-cell}
+:tags: []
+
+---
+title: "Retrieve and prepare data"
+format:
+  html: 
+    code-fold: true
+    ipynb-filters:
+      - popemp/tools.py filter-docs
+---
+```
+
++++ {"tags": ["nbd-docs"]}
 
 In this module we download, process and store geographic shapes, population and employment data from US Census Bureau.
 
@@ -34,9 +46,8 @@ nbd = Nbd('popemp')
 data_dir = nbd.root/'data'
 ```
 
-+++ {"tags": []}
++++ {"tags": ["nbd-docs"]}
 
-[nbd]: # "docs"
 # Geography
 
 We need state and county FIPS codes and names, and their shapes for map visualizations. Here we use [2018 Cartographic Boundary Files](https://www.census.gov/geographies/mapping-files/time-series/geo/carto-boundary-file.2018.html) - simplified representations of selected geographic areas from the Census Bureau’s MAF/TIGER geographic database. These boundary files are specifically designed for small scale thematic mapping.
@@ -74,40 +85,39 @@ def geo():
     return df
 ```
 
-[nbd]: # "docs"
++++ {"tags": ["nbd-docs"]}
+
 This is the top of the dataframe.
 
 ```{code-cell} ipython3
-:tags: []
+:tags: [nbd-docs]
 
-#nbd docs
 geo().head()
 ```
 
-[nbd]: # "docs"
++++ {"tags": ["nbd-docs"]}
+
 `geopandas` stores shapes as [shapely](https://shapely.readthedocs.io) polygons in the `geometry` column. You can perform various geometric operations with these objects, refer to `geopandas` and `shapely` documentation. For example, let's select and plot all states that cross the band between -120 and -110 degrees of longitude, roughly US Pacific coast.
 
 ```{code-cell} ipython3
-:tags: []
+:tags: [nbd-docs]
 
-#nbd docs
 d = geo().cx[-120:-110, :].query('cty == "000"')
 d.plot();
 ```
 
-[nbd]: # "docs"
++++ {"tags": ["nbd-docs"]}
+
 Be mindful of Coordinate Reference System ([CRS](https://en.wikipedia.org/wiki/Spatial_reference_system)) when working with shapefiles. If you combine shapefiles from multiple sources, make sure to align their CRS's. Census shapefiles come in `EPSG:4269`. The same map in "Spherical Mercator" (`EPSG:3857`, used in Google Maps) will look like this.
 
 ```{code-cell} ipython3
-:tags: []
+:tags: [nbd-docs]
 
-#nbd docs
 d.to_crs(epsg=3857).plot();
 ```
 
-+++ {"tags": []}
++++ {"tags": ["nbd-docs"]}
 
-[nbd]: # "docs"
 # Population
 
 We are using annual state and county population 1990-2019 from Census Population Estimates Program ([PEP](https://www.census.gov/programs-surveys/popest.html)). Data are available in 10 year blocks for [2010-2019](https://www.census.gov/data/datasets/time-series/demo/popest/2010s-counties-total.html), [2000-2010](https://www.census.gov/data/datasets/time-series/demo/popest/intercensal-2000-2010-counties.html) and [1990-1999](https://www2.census.gov/programs-surveys/popest/tables/1990-2000/).
@@ -146,7 +156,8 @@ def pop_2000_2009():
     return df
 ```
 
-[nbd]: # "docs"
++++ {"tags": ["nbd-docs"]}
+
 1990-1999 data are in a long text file. `pop_1990_1999()` does some more elaborate parsing. Table with state and county population has `"1"` as the first character in every line. We use this to read necessary lines into a temporary string buffer, and then parse the buffer into a dataframe.
 
 ```{code-cell} ipython3
@@ -185,7 +196,8 @@ def pop_1990_1999():
     return df
 ```
 
-[nbd]: # "docs"
++++ {"tags": ["nbd-docs"]}
+
 Finally, in `pop()` we call the three above functions to create three frames, combine them and add aggregated rows of national totals with state code `"00"` and county code `"000"`. We also compute year-to-year growth rate in percentage points in column `pop_gr`. Final dataframe is pickled for easy access.
 
 ```{code-cell} ipython3
@@ -220,19 +232,18 @@ def pop():
 ```
 
 ```{code-cell} ipython3
-:tags: []
+:tags: [nbd-docs]
 
-#nbd docs
 pop().head()
 ```
 
-[nbd]: # "docs"
++++ {"tags": ["nbd-docs"]}
+
 Quick visual inspection of the data reveals an abnormal population jump between 1999 and 2000. It is clear on national and state level, but not so on county level. I could not find out the cause, but it is most likely a data artifact. This is something to be aware of, but it does not matter for the purposes of this project.
 
 ```{code-cell} ipython3
-:tags: []
+:tags: [nbd-docs]
 
-#nbd docs
 d = pop().set_index('year')
 fig, ax = plt.subplots(1, 3, figsize=(16, 4))
 d.query('st == "00" and cty == "000"')['pop'].plot(ax=ax[0])
@@ -243,9 +254,8 @@ d.query('st == "55" and cty == "025"')['pop'].plot(ax=ax[2])
 ax[2].set_title('Wisconsin, Dane county');
 ```
 
-+++ {"tags": []}
++++ {"tags": ["nbd-docs"]}
 
-[nbd]: # "docs"
 # Employment
 
 State and county employment comes from Census Business Dynamics Statistics ([BDS](https://www.census.gov/programs-surveys/bds.html)). This product has some improvements over more widely used County Business Patterns, and entire history can be downloaded in a single table from [here](https://www.census.gov/data/datasets/time-series/econ/bds/bds-datasets.html).
@@ -290,16 +300,14 @@ def emp():
 ```
 
 ```{code-cell} ipython3
-:tags: []
+:tags: [nbd-docs]
 
-#nbd docs
 emp().head()
 ```
 
 ```{code-cell} ipython3
-:tags: []
+:tags: [nbd-docs]
 
-#nbd docs
 d = emp().set_index('year')
 fig, ax = plt.subplots(1, 3, figsize=(16, 4))
 d.query('st == "00" and cty == "000"')['emp'].plot(ax=ax[0])
@@ -310,9 +318,8 @@ d.query('st == "55" and cty == "025"')['emp'].plot(ax=ax[2])
 ax[2].set_title('Wisconsin, Dane county');
 ```
 
-+++ {"tags": []}
++++ {"tags": ["nbd-docs"]}
 
-[nbd]: # "docs"
 # API
 
 Here is a little demo of retrieving a table from a data provider using API. We are not going to use it in this project, because bulk data download as readily available as CSV files, and API access rates are often limited and may require access key. However for some other data sources API access may be the only option. Another good use case is when whole data is huge, and you are building a web app (dashboard) that only needs to pull small pieces of data at a time.
@@ -342,9 +349,8 @@ Query limits:
 Querying without a key will probably work for you, unless you are sharing your IP with many other users. You can obtain a key for free, but you should keep it secret and not accidentally share, for example, by hard-coding it in your code or commiting a file. Here I have my key in a text file that is ignored in `.gitignore` and only exists in my local copy of the repo. Another common appoach is to store keys in OS environment variables.
 
 ```{code-cell} ipython3
-:tags: []
+:tags: [nbd-docs]
 
-#nbd docs
 import requests
 
 p = nbd.root/'census_api_key.txt'
@@ -362,9 +368,8 @@ response_body[:5]
 ```
 
 ```{code-cell} ipython3
-:tags: []
+:tags: [nbd-docs]
 
-#nbd docs
 df = pd.DataFrame(response_body[1:], columns=response_body[0])
 df.query('county == "025"').head()
 ```

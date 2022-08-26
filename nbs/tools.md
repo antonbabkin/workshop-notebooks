@@ -12,14 +12,29 @@ kernelspec:
   name: python3
 ---
 
-[nbd]: # "docs"
-# Tools and utilities
+```{raw-cell}
+:tags: []
+
+---
+title: "Tools and utilities"
+format:
+  html: 
+    code-fold: true
+    ipynb-filters:
+      - popemp/tools.py filter-docs
+---
+```
+
++++ {"tags": ["nbd-docs"]}
 
 This notebook contains general purpose tools that are used throughout the project and might also be useful outside.
 
 ```{code-cell} ipython3
+:tags: []
+
 #nbd module
 import os
+import sys
 import re
 import inspect
 import shutil
@@ -27,16 +42,12 @@ from urllib.parse import urlparse
 from pathlib import Path
 import io
 
-import yaml
 import requests
 import nbconvert
 import nbformat
-import mkdocs.config, mkdocs.commands.build
 ```
 
-+++ {"tags": []}
-
-[nbd]: # "docs"
++++ {"tags": ["nbd-docs"]}
 
 # NBD: development in the notebook
 
@@ -48,9 +59,12 @@ To use `Nbd`, create an instance with the name of your package and call methods 
 
 Method `Nbd.nb2mod()` selectively exports code cells into a script, making it easily importable in other parts of the project and also leaving out scratch and exploratory code. To mark code cell for export to a module, put `#nbd module` in the first line of the cell. All imports from project modules into notebooks should take absolute form `from ... import ...`, they will be automatically converted to relative import in scripts. For example, `from popemp.tools import Nbd` will become `from .tools import Nbd`.
 
-Turning notebook into a documentation page takes two steps. First, notebook is converted to a Markdown file in `docs_src/` folder, and then all Markdown files are turned into a searchable HTML website in `docs/` folder using [MkDocs](https://www.mkdocs.org) utility. To mark code cell for documentation, put `#nbd docs` in the first line of the cell. It can also be `#nbd module docs` if cell goes both to module and documentation. To mark markdown cells, add `[nbd]: # "docs"` in the first line of the cell. Method `Nbd.build_docs()` performs both steps for each notebook specified in the `mkdocs.yml` file at project root. This file can be also used to configure site structure. Site is stored in `docs/` folder and pushed to GitHub, so it can be easily hosted as GitHub pages (enable in GitHub repo settings). Check MkDocs documentation for configuration options and other deployment alternatives.
+Turning notebook into a documentation page is done with Quarto.
+TODO: finish this paragraph.
 
 ```{code-cell} ipython3
+:tags: []
+
 #nbd module
 class Nbd:
     def __init__(self, pkg_name):
@@ -62,10 +76,6 @@ class Nbd:
         p = self.nbs_path = self.root/self.nbs_dir
         assert p.exists() and p.is_dir()
         self._make_symlinks()
-        
-        self._make_docs_dirs()
-        self.docs_config = mkdocs.config.load_config((self.root/'mkdocs.yml').open())
-        self.docs_path = Path(self.docs_config['docs_dir'])
         
     def _locate_root_path(self):
         # call stack: 0=this function, 1=__init__(), 2=caller
@@ -98,20 +108,7 @@ class Nbd:
             print(f'Creating symbolic link "{link}" -> "{to}"')
             
         os.chdir(cur_dir)
-        
-    def _make_docs_dirs(self):
-        docs_conf = yaml.safe_load(open(self.root/'mkdocs.yml'))
-        
-        d = self.root / docs_conf['docs_dir']
-        if not d.exists():
-            print(f'Creating directory "{d.relative_to(self.root)}"')
-        d.mkdir(exist_ok=True)
 
-        d = self.root / docs_conf['site_dir']
-        if not d.exists():
-            print(f'Creating directory "{d.relative_to(self.root)}"')
-        d.mkdir(exist_ok=True)
-        
         
     def nb2mod(self, nb_rel_path):
         """`nb_rel_path` is relative to project's notebook directory."""
@@ -169,89 +166,44 @@ class Nbd:
             return first_line.split('"')[1].split()
         return []
     
-    def nb2doc(self, nb_rel_path):
-        """`nb_rel_path` is relative to project's notebook directory.
-        Does not copy ![]() images from markdown cells, those must be copied manually.
-        """
-        nb_rel_path = Path(nb_rel_path)
-        nb_path = self.nbs_path/nb_rel_path
-        assert nb_path.exists() and nb_path.is_file(), f'Notebook not found at "{nb_path}".'
-        nb = nbformat.read(nb_path, nbformat.current_nbformat)
-        nb.cells = [c for c in nb.cells if ('docs' in self.get_cell_flags(c))]
-        exporter = nbconvert.exporters.MarkdownExporter()
-        md, res = exporter.from_notebook_node(nb)
-        
-        # remove #nbd lines, change img paths
-        md = '\n'.join(self.rename_img(l, nb_rel_path.stem)
-                       for l in md.split('\n')
-                       if not (l.startswith('#nbd') or l.startswith('[nbd]:')))
-        
-        w = nbconvert.writers.FilesWriter(build_directory=str(self.docs_path))
-        md_path = w.write(md, res, nb_rel_path.stem)
-        
-        # move imgs to new paths
-        imgs = []
-        if res['outputs'] != '':
-            for img in res['outputs'].keys():
-                old = self.docs_path/Path(img)
-                new_dir = old.parent/'img'
-                new_dir.mkdir(parents=True, exist_ok=True)
-                new = new_dir/f'{nb_rel_path.stem}_{img}'
-                old.rename(new)
-                imgs.append(new)
-        
-        src = nb_path.relative_to(self.root)
-        dst = md_path.relative_to(self.root)
-        imgs = (' and images ' + ', '.join(f'"{p.relative_to(self.root)}"' for p in imgs)
-                if imgs else '')
-        print(f'Converted notebook "{src}" to document "{dst}"{imgs}.')
-
-    @staticmethod
-    def rename_img(line, nb_basename):
-        """
-        Replace line like "![png](output.png)" with "![png](notebook_output.png)"
-        """
-        pattern = r'^.*!\[.+?\]\((.+?)\).*$'
-        m = re.match(pattern, line)
-        if not m: 
-            return line
-        old = m.group(1)
-        new = str(Path('img')/f'{nb_basename}_{old}')
-        return line.replace(old, new)
-
-    def build_docs(self):
-        for item in self.docs_config['nav']:
-            md_path = list(item.values())[0]
-            assert isinstance(md_path, str) and md_path.endswith('.md'), md_path
-            if md_path == 'README.md':
-                s = self.root/'README.md'
-                d = self.docs_path/'README.md'
-                shutil.copyfile(s, d)
-                print(f'Copied "{s.relative_to(self.root)}" to "{d.relative_to(self.root)}".')
-            else:
-                self.nb2doc(Path(md_path).with_suffix('.ipynb'))
-        mkdocs.commands.build.build(self.docs_config)
-        p = Path(self.docs_config['site_dir']).relative_to(self.root)
-        print(f'Documentation built in "{p}".')
 ```
 
-[nbd]: # "docs"
++++ {"tags": ["nbd-docs"]}
+
 Example and testing of `Nbd`.
 
 ```{code-cell} ipython3
-#nbd docs
+:tags: [nbd-docs]
+
 nbd = Nbd('popemp')
 print(f'Project root directory: "{nbd.root}"')
 ```
+
++++ {"tags": ["nbd-docs"]}
+
+# Documentation filtering
+
+```{code-cell} ipython3
+#nbd module
+def filter_docs():
+    """Only keep cells with "nbd-docs" tag."""
+    nb = nbformat.reads(sys.stdin.read(), as_version=nbformat.NO_CONVERT)
+    nb.cells = [
+        c for c in nb.cells
+        if ('tags' in c.metadata) and ('nbd-docs' in c.metadata.tags)
+    ]
+    nbformat.write(nb, sys.stdout)
+```
+
++++ {"tags": ["nbd-docs"]}
 
 [nbd]: # "docs"
 # Notebooks and Git
 
 Jupyter notebooks are technically JSON files with possibly embedded binary data in output cells (e.g. images). This make them not very Git friendly, because most Git tools are designed to work with plain text files. Git diffs of notebooks are not very readable, merges break notebooks, and binary blobs clog storage and don't diff or merge. Multiple approaches exist to address these problems, and I recommend using the [Jupytext](https://github.com/mwouts/jupytext) tool to only version plaintext replicas of notebooks and add `.ipynb` files to .gitignore.
 
-+++ {"tags": []}
++++ {"tags": ["nbd-docs"]}
 
-[nbd]: # "docs"
 # Misc
 
 `download_file()` takes URL, downloads file to specified location and returns it's path. Subsequent calls to the same function return cached copy from disk. We use this function to automate manual operations, to simplify replication and to allow pulling data into our cloud-hosted dashboard.
@@ -288,23 +240,40 @@ def download_file(url, dir=None, fname=None, overwrite=False, verbose=True):
     return fpath
 ```
 
-[nbd]: # "docs"
++++ {"tags": ["nbd-docs"]}
+
 Example: download LICENSE file from GitHub repo and assert that it's contents is the same as in the local repo version.
 
 ```{code-cell} ipython3
-#nbd docs
+:tags: [nbd-docs]
+
 nbd = Nbd('popemp')
 f = download_file('https://raw.githubusercontent.com/antonbabkin/workshop-notebooks/main/LICENSE', nbd.root, 'LICENSE_COPY')
 assert open(nbd.root/'LICENSE').read() == open(f).read()
 f.unlink()
 ```
 
-[nbd]: # "docs"
++++ {"tags": ["nbd-docs"]}
+
+# CLI interface
+
+```{code-cell} ipython3
+:tags: []
+
+#nbd module
+if __name__ == '__main__':
+    if sys.argv[1] == 'filter-docs':
+        filter_docs()
+```
+
++++ {"tags": ["nbd-docs"]}
+
 # Build this module
 This notebook itself is turned into importable module by running the code below.
 
 ```{code-cell} ipython3
-#nbd docs
+:tags: [nbd-docs]
+
 nbd = Nbd('popemp')
 nbd.nb2mod('tools.ipynb')
 ```
