@@ -64,6 +64,8 @@ Settings -> Update & Security -> For developers -> Developer mode
     
 1. In Jupyter, open and run `nbs/index.md` notebook to inivialize paths and test your environment. You will need to right-click the file and choose "Open With -> Notebook" to let Jupytext automatically create a notebook from markdown.
 
+1. Install Quarto CLI for your operating system from [here](https://quarto.org/docs/get-started/).
+
 
 ## License
 
