@@ -12,29 +12,39 @@ kernelspec:
   name: python3
 ---
 
-This notebook serves as a control panel for various high level tasks in the project. It can also be used to build `__init__.py`, top level module of your package where you can expose package API for use from other packages.
+This notebook contains code for project initialization and testing.
+Run all cells in order.
+If you see outputs and no errors, your environment is probably working correctly.
+Cells in this notebook are safe to run multiple times.
 
 +++
 
 # Initialize paths
 
-File organization in this project requires package directory `popemp` to be visible inside of the notebooks directory `nbs`. When you clone this repository for the first time, you need to run the below cell to create a symbolic link that points to `popemp`. IPython `%cd` magics are used to temporarily move up one level to project root and then back. Calling `Nbd` class constructor creates symlinks and other neccesy directories.
+File organization in this project requires package directory `popemp` to be visible inside of the notebooks directory `nbs`. When you clone this repository for the first time, you need to run the below cell to create a symbolic link that points to `popemp`. IPython cross-platform `%cd` magics are used to temporarily move up one level to project root and then back. Calling `Nbd` class constructor creates symlinks and other neccesy directories.
 
 ```{code-cell} ipython3
+:tags: []
+
 %cd ..
 from popemp.tools import Nbd
 nbd = Nbd('popemp')
 %cd -
-# make sure that "popemp" is visible inside of "nbs"
+# verify that project root is the folder into which you cloned the repository
 print(f'Project root: "{nbd.root}"')
-print('Notebooks folder contents:')
-%ls {nbd.root/'nbs'}
+# make sure that "nbs/popemp" contains "analysis.py", "data.py" and "tools.py"
+print('"nbs/popemp/" folder contents:')
+%ls {nbd.root/'nbs/popemp'}/
 ```
 
-# Test your environment
-Run the cell below. If your environment works, you should see a map with an interactive slider in the output.
+# Python environment
+
+The code cell below will test main packages that should be available in active Conda/Python environment.
+If the environment works, you should see a map with an interactive slider in the output.
 
 ```{code-cell} ipython3
+:tags: []
+
 import numpy as np
 import pandas as pd
 import geopandas
@@ -78,16 +88,41 @@ upd({'new': years.value})
 widgets.VBox([years, out])
 ```
 
-# Build all modules
+# Project modules
+
+The cells below test modules of this project.
+Running them should display a few maps and figures.
 
 ```{code-cell} ipython3
-from popemp.tools import Nbd
-nbd = Nbd('popemp')
-nbd.nb2mod('tools.ipynb')
-nbd.nb2mod('data.ipynb')
-nbd.nb2mod('analysis.ipynb')
+:tags: [nbd-docs]
+
+from popemp import tools
+nbd = tools.Nbd('popemp')
+f = tools.download_file('https://raw.githubusercontent.com/antonbabkin/workshop-notebooks/main/LICENSE', nbd.root, 'LICENSE_COPY')
+assert open(nbd.root/'LICENSE').read() == open(f).read()
+f.unlink()
 ```
 
-# Build documentation site
+```{code-cell} ipython3
+:tags: [nbd-docs]
 
-TODO needs update
+import plotly.express as px
+from popemp import data
+wi = 'st == "55" and cty == "000"'
+display(data.geo().query(wi).explore(width=600, height=400))
+data.pop().query(wi).set_index('year')['pop'].plot(title='Wisconsin population')
+fig = px.line(data.emp().query(wi), x='year', y='emp', title='Wisconsin employment')
+fig.show()
+```
+
+```{code-cell} ipython3
+:tags: []
+
+from popemp import analysis
+analysis.prep_data()
+display(analysis.plot_agr('55', 2005, 2015, 'rel'))
+
+m = analysis.Map()
+m.upd('00', 2005, 2015, 'rel')
+m.widget
+```

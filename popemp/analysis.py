@@ -171,6 +171,17 @@ def plot_agr(st, y0, y1, abs_rel):
     return fig
 
 
+def area_gdf(st, y0, y1, abs_rel):
+    if st == '00':
+        df = DF['geo'].query('cty == "000"')
+    else:
+        df = DF['geo'].query('st == @st')
+
+    df = df.merge(compute_agr(y0, y1))
+    df['color'] = color_from_agr_cat(df, abs_rel)
+    return df
+
+
 class Map:
     def __init__(self, click_callback=None):
         self.widget = leaflet.Map(center=(40, -95), zoom=4)
@@ -185,14 +196,8 @@ class Map:
         pass
 
     @staticmethod
-    def area_gdf(st, y0, y1, abs_rel):
-        if st == '00':
-            df = DF['geo'].query('cty == "000"')
-        else:
-            df = DF['geo'].query('st == @st')
-
-        df = df.merge(compute_agr(y0, y1))
-        df['color'] = color_from_agr_cat(df, abs_rel)
+    def _area_gdf(st, y0, y1, abs_rel):
+        df = area_gdf(st, y0, y1, abs_rel)
         df = df[['st', 'cty', 'name', 'geometry', 'color']]
         return df
     
@@ -205,7 +210,7 @@ class Map:
         # ipyleaflet.GeoData is a natural choice for area layer, but it does not support style_callback()
         # so we use ipyleaflet.GeoJSON instead
         # proposed fix: https://github.com/jupyter-widgets/ipyleaflet/pull/786
-        gdf = self.area_gdf(st, y0, y1, abs_rel)
+        gdf = self._area_gdf(st, y0, y1, abs_rel)
         layer = leaflet.GeoJSON(data=json.loads(gdf.to_json()),
                         style={'stroke': False, 'fillOpacity': 0.6},
                         hover_style={'stroke': True},
