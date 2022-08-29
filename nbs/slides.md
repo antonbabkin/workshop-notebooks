@@ -12,36 +12,37 @@ kernelspec:
   name: python3
 ---
 
-+++ {"slideshow": {"slide_type": "slide"}, "tags": []}
+```{raw-cell}
 
-# Literate programming and interactive reporting with Jupyter notebooks
-*aka Notebok Imperialism*
+---
+title: "Jupyter notebooks"
+subtitle: "Literate programming and interactive reporting"
+author: "Anton Babkin (anton.babkin@uconn.edu)"
+institute: UConn and UW-Madison
+date: "29-30 August 2022"
+format: 
+  revealjs:
+    progress: true
+    embed-resources: true
+---
+```
 
-**Anton Babkin**  
-UConn and UW-Madison  
-anton.babkin@uconn.edu
-
-UW-Madison Data Science Research Bazaar  
-9 February 2022
-
-+++ {"slideshow": {"slide_type": "slide"}, "tags": []}
-
-# Scientific paper is obsolete
+## Scientific paper is obsolete
 [The Atlantic](https://www.theatlantic.com/science/archive/2018/04/the-scientific-paper-is-obsolete/556676/), April 5, 2018
 
-![atlantic](https://cdn.theatlantic.com/assets/media/img/mt/2018/04/FlameNew_1/facebook.gif)
+![](https://cdn.theatlantic.com/assets/media/img/mt/2018/04/FlameNew_1/facebook.gif)
 
-+++ {"slideshow": {"slide_type": "slide"}, "tags": []}
++++ {"tags": []}
 
-# Literate programming
+## Literate programming
 
 > Let us change our traditional attitude to the construction of programs: Instead of imagining that our main task is to instruct a computer what to do, let us concentrate rather on explaining to humans what we want the computer to do.
 
 Donald E. Knuth, Literate Programming, 1984
 
-+++ {"slideshow": {"slide_type": "slide"}, "tags": []}
++++ {"tags": []}
 
-# This workshop
+## This workshop
 
 - walk though all steps of a research project
 - focus on documentation and modularity
@@ -52,16 +53,16 @@ Donald E. Knuth, Literate Programming, 1984
 Research question:  
 How states and counties in the USA compare in terms of their population and employment growth?
 
-+++ {"slideshow": {"slide_type": "slide"}, "tags": []}
++++ {"tags": []}
 
-# Output preview
+## Output preview
 
 - public GitHub repository
 - static documentation site
-- dashboard on Binder
+- dashboard
 - importable components
 
-+++ {"slideshow": {"slide_type": "subslide"}, "tags": []}
++++ {"tags": []}
 
 ## importable components
 
@@ -73,38 +74,61 @@ analysis.prep_data()
 analysis.plot_growth('55', '000', 2005, 2015)
 ```
 
-+++ {"slideshow": {"slide_type": "slide"}, "tags": []}
+## Tools
 
-# Environment
+- Jupyter notebooks
+- Git, GitHub and GitHub Pages
+- Jupytext
+- conda/mamba
+- Quarto
+- Voila
+- Binder
+- custom scripts in `tools.py`
 
-If you have a local Python/conda environment, pull most recent copy of the repo. Easiest way to do this is to delete everything and make a fresh clone.
++++ {"tags": []}
 
-If you do not have local environment, *try* to use Binder.
+## Environment checklist
 
-+++ {"slideshow": {"slide_type": "slide"}, "tags": []}
+- install git, conda and mamba
 
-# File structure
+- update local repo (will erase your changes)
+```
+cd workshop-notebooks
+git reset --hard
+git pull
+```
+    
+- update conda env
+```
+mamba env update -f environment.yml
+```
+
+- run index notebook
+
+If you do not have a local environment, use Binder.
+
++++ {"tags": []}
+
+## File structure
 
 ```
 README.md
 environment.yml        # env reproducibility
-mkdocs.yml             # docs config
-nbs/
-    __init__.ipynb     # control panel
-    tools.ipynb
-    data.ipynb
-    analysis.ipynb
+data/                  
+nbs/                   # source notebooks
+    index.ipynb        # init and env test
+    tools.ipynb        # (1)
+    data.ipynb         # (2)
+    analysis.ipynb     # (3)
     dashboard.ipynb
-popemp/
-    tools.py
-    data.py
-    analysis.py
-docs_src/              # temporary docs files, gitignore
-    tools.md
-    data.md
-    analysis.md
+    popemp/            # symlink to ../popemp/
+    _quarto.yml        # docs website spec
+popemp/                # importable Python package
+    tools.py           # (1)
+    data.py            # (2)
+    analysis.py        # (3)
 docs/                  # docs site hosted on GitHub
-    tools.html         # actual files are different
-    data.html          # but they are HTML versions
-    analysis.html      # of notebooks
+    tools.html         # (1)
+    data.html          # (2)
+    analysis.html      # (3)
 ```

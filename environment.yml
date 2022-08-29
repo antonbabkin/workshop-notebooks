@@ -12,4 +12,5 @@ dependencies:
   - ipywidgets
   - folium
   - ipyleaflet
-  # - voila # dashboard stopped working in Voila
+  - voila=0.3.6
+

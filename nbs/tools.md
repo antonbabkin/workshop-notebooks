@@ -48,6 +48,13 @@ import nbformat
 
 +++ {"tags": ["nbd-docs"]}
 
+[nbd]: # "docs"
+# Notebooks and Git
+
+Jupyter notebooks are technically JSON files with possibly embedded binary data in output cells (e.g. images). This make them not very Git friendly, because most Git tools are designed to work with plain text files. Git diffs of notebooks are not very readable, merges break notebooks, and binary blobs clog storage and don't diff or merge. Multiple approaches exist to address these problems, and I recommend using the [Jupytext](https://github.com/mwouts/jupytext) tool to only version plaintext replicas of notebooks and add `.ipynb` files to `.gitignore`.
+
++++ {"tags": ["nbd-docs"]}
+
 # NBD: development in the notebook
 
 This section defines the `Nbd` class that can be used to convert a notebook into a script or a documentation page. This approach was greatly inspired by the [nbdev](https://github.com/fastai/nbdev) project and can be thought of as a reduced and simplified `nbdev`.
@@ -57,9 +64,6 @@ This section defines the `Nbd` class that can be used to convert a notebook into
 To use `Nbd`, create an instance with the name of your package and call methods from that instance like so: `nbd = Nbd('popemp')`.
 
 Method `Nbd.nb2mod()` selectively exports code cells into a script, making it easily importable in other parts of the project and also leaving out scratch and exploratory code. To mark code cell for export to a module, give it a `nbd-module` tag. All imports from project modules into notebooks should take absolute form `from ... import ...`, they will be automatically converted to relative import in scripts. For example, `from popemp.tools import Nbd` will become `from .tools import Nbd`.
-
-Turning notebook into a documentation page is done with Quarto.
-TODO: finish this paragraph.
 
 ```{code-cell} ipython3
 :tags: [nbd-module]
@@ -171,7 +175,10 @@ print(f'Project root directory: "{nbd.root}"')
 
 +++ {"tags": ["nbd-docs"]}
 
-# Documentation filtering
+# Documentation
+
+Static HTML documentation website is built from notebooks using [Quarto](https://quarto.org/).
+`filter_docs()` function is used to only select cells with `nbd-docs` tag.
 
 ```{code-cell} ipython3
 :tags: [nbd-module]
@@ -185,13 +192,6 @@ def filter_docs():
     ]
     nbformat.write(nb, sys.stdout)
 ```
-
-+++ {"tags": ["nbd-docs"]}
-
-[nbd]: # "docs"
-# Notebooks and Git
-
-Jupyter notebooks are technically JSON files with possibly embedded binary data in output cells (e.g. images). This make them not very Git friendly, because most Git tools are designed to work with plain text files. Git diffs of notebooks are not very readable, merges break notebooks, and binary blobs clog storage and don't diff or merge. Multiple approaches exist to address these problems, and I recommend using the [Jupytext](https://github.com/mwouts/jupytext) tool to only version plaintext replicas of notebooks and add `.ipynb` files to .gitignore.
 
 +++ {"tags": ["nbd-docs"]}
 
@@ -248,6 +248,8 @@ f.unlink()
 +++ {"tags": ["nbd-docs"]}
 
 # CLI interface
+
+If `tools.py` is execuded directly as a module with `filter-docs` argument, it will apply the documentation filter. This is used for `ipynb-filters` option of Quarto renderer.
 
 ```{code-cell} ipython3
 :tags: [nbd-module]
