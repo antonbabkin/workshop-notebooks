@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.1.141">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Notebook Imperialism - Retrieve and prepare data</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">Notebook Imperialism</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./tools.html">Tools</a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="./data.html" aria-current="page">Data</a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./analysis.html">Analysis</a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#geography" id="toc-geography" class="nav-link active" data-scroll-target="#geography">Geography</a></li>
+  <li><a href="#population" id="toc-population" class="nav-link" data-scroll-target="#population">Population</a></li>
+  <li><a href="#employment" id="toc-employment" class="nav-link" data-scroll-target="#employment">Employment</a></li>
+  <li><a href="#api" id="toc-api" class="nav-link" data-scroll-target="#api">API</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Retrieve and prepare data</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    
+  </div>
+  
+
+</header>
+
+<p>In this module we download, process and store geographic shapes, population and employment data from US Census Bureau.</p>
+<section id="geography" class="level1">
+<h1>Geography</h1>
+<p>We need state and county FIPS codes and names, and their shapes for map visualizations. Here we use <a href="https://www.census.gov/geographies/mapping-files/time-series/geo/carto-boundary-file.2018.html">2018 Cartographic Boundary Files</a> - simplified representations of selected geographic areas from the Census Bureau’s MAF/TIGER geographic database. These boundary files are specifically designed for small scale thematic mapping.</p>
+<p>Function <code>geo()</code> downloads state and county 1:20,000,000 shapefiles using <a href="https://geopandas.org">geopandas</a> library, reshapes and combines them into single a GeoDataFrame. We use county code <code>"000"</code> as indicator of state rows. Resulting dataframe is cached on disk as a binary <code>pickle</code> file, and when subsequent calls of <code>geo()</code> will simply read and return the dataframe from cache to save time and avoid work. Delete <code>data/geo.pkl</code> if you want to re-create the dataframe, for example, after you changed the function. Similarly, <code>download_file()</code> also caches files on disk.</p>
+<p>This is the top of the dataframe.</p>
+<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-08-29T06:48:13.447856Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-08-29T06:48:13.446445Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-08-29T06:48:13.571267Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-08-29T06:48:13.570350Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-08-29T06:48:13.447799Z&quot;}" data-tags="[&quot;nbd-docs&quot;]" data-execution_count="3">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>geo().head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="3">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>st</th>
+      <th>cty</th>
+      <th>name</th>
+      <th>geometry</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>01</td>
+      <td>000</td>
+      <td>Alabama</td>
+      <td>POLYGON ((-88.46866 31.89386, -88.46866 31.933...</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>01</td>
+      <td>001</td>
+      <td>Autauga county, Alabama</td>
+      <td>POLYGON ((-86.91759 32.66417, -86.71339 32.661...</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>01</td>
+      <td>003</td>
+      <td>Baldwin county, Alabama</td>
+      <td>POLYGON ((-88.02632 30.75336, -87.94455 30.827...</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>01</td>
+      <td>005</td>
+      <td>Barbour county, Alabama</td>
+      <td>POLYGON ((-85.73573 31.62449, -85.66565 31.786...</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>01</td>
+      <td>007</td>
+      <td>Bibb county, Alabama</td>
+      <td>POLYGON ((-87.42194 33.00338, -87.31854 33.006...</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+<p><code>geopandas</code> stores shapes as <a href="https://shapely.readthedocs.io">shapely</a> polygons in the <code>geometry</code> column. You can perform various geometric operations with these objects, refer to <code>geopandas</code> and <code>shapely</code> documentation. For example, let’s select and plot all states that cross the band between -120 and -110 degrees of longitude, roughly US Pacific coast.</p>
+<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-08-29T06:48:13.574110Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-08-29T06:48:13.573293Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-08-29T06:48:14.025495Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-08-29T06:48:14.024088Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-08-29T06:48:13.574073Z&quot;}" data-tags="[&quot;nbd-docs&quot;]" data-execution_count="4">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>d <span class="op">=</span> geo().cx[<span class="op">-</span><span class="dv">120</span>:<span class="op">-</span><span class="dv">110</span>, :].query(<span class="st">'cty == "000"'</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>d.plot()<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<p><img src="data_files/figure-html/cell-3-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<p>Be mindful of Coordinate Reference System (<a href="https://en.wikipedia.org/wiki/Spatial_reference_system">CRS</a>) when working with shapefiles. If you combine shapefiles from multiple sources, make sure to align their CRS’s. Census shapefiles come in <code>EPSG:4269</code>. The same map in “Spherical Mercator” (<code>EPSG:3857</code>, used in Google Maps) will look like this.</p>
+<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-08-29T06:48:14.036354Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-08-29T06:48:14.035790Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-08-29T06:48:20.329287Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-08-29T06:48:20.328088Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-08-29T06:48:14.036319Z&quot;}" data-tags="[&quot;nbd-docs&quot;]" data-execution_count="5">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>d.to_crs(epsg<span class="op">=</span><span class="dv">3857</span>).plot()<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<p><img src="data_files/figure-html/cell-4-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="population" class="level1">
+<h1>Population</h1>
+<p>We are using annual state and county population 1990-2019 from Census Population Estimates Program (<a href="https://www.census.gov/programs-surveys/popest.html">PEP</a>). Data are available in 10 year blocks for <a href="https://www.census.gov/data/datasets/time-series/demo/popest/2010s-counties-total.html">2010-2019</a>, <a href="https://www.census.gov/data/datasets/time-series/demo/popest/intercensal-2000-2010-counties.html">2000-2010</a> and <a href="https://www2.census.gov/programs-surveys/popest/tables/1990-2000/">1990-1999</a>.</p>
+<p>Note on <a href="https://www.census.gov/programs-surveys/geography/technical-documentation/user-note/special-characters.html">character encoding</a> of plain text files, including CSV: newer files use <code>"UTF-8"</code>, older use <code>"ISO-8859-1"</code>.</p>
+<p>Post-2000 files are simple CSV tables. Functions <code>pop_2010_2019()</code> and <code>pop_2000_2009()</code> download and read them into dataframes with minor manipulation.</p>
+<p>1990-1999 data are in a long text file. <code>pop_1990_1999()</code> does some more elaborate parsing. Table with state and county population has <code>"1"</code> as the first character in every line. We use this to read necessary lines into a temporary string buffer, and then parse the buffer into a dataframe.</p>
+<p>Finally, in <code>pop()</code> we call the three above functions to create three frames, combine them and add aggregated rows of national totals with state code <code>"00"</code> and county code <code>"000"</code>. We also compute year-to-year growth rate in percentage points in column <code>pop_gr</code>. Final dataframe is pickled for easy access.</p>
+<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-08-29T06:48:20.438034Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-08-29T06:48:20.431323Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-08-29T06:48:20.491184Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-08-29T06:48:20.487523Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-08-29T06:48:20.437873Z&quot;}" data-tags="[&quot;nbd-docs&quot;]" data-execution_count="10">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>pop().head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="10">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>st</th>
+      <th>cty</th>
+      <th>year</th>
+      <th>pop</th>
+      <th>pop_gr</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>00</td>
+      <td>000</td>
+      <td>1990</td>
+      <td>249470539</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>00</td>
+      <td>000</td>
+      <td>1991</td>
+      <td>252208537</td>
+      <td>1.097524</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>00</td>
+      <td>000</td>
+      <td>1992</td>
+      <td>255104027</td>
+      <td>1.148054</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>00</td>
+      <td>000</td>
+      <td>1993</td>
+      <td>257857622</td>
+      <td>1.079401</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>00</td>
+      <td>000</td>
+      <td>1994</td>
+      <td>260401091</td>
+      <td>0.986385</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+<p>Quick visual inspection of the data reveals an abnormal population jump between 1999 and 2000. It is clear on national and state level, but not so on county level. I could not find out the cause, but it is most likely a data artifact. This is something to be aware of, but it does not matter for the purposes of this project.</p>
+<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-08-29T06:48:20.494303Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-08-29T06:48:20.492815Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-08-29T06:48:20.986492Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-08-29T06:48:20.985495Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-08-29T06:48:20.494251Z&quot;}" data-tags="[&quot;nbd-docs&quot;]" data-execution_count="11">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>d <span class="op">=</span> pop().set_index(<span class="st">'year'</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">16</span>, <span class="dv">4</span>))</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>d.query(<span class="st">'st == "00" and cty == "000"'</span>)[<span class="st">'pop'</span>].plot(ax<span class="op">=</span>ax[<span class="dv">0</span>])</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].set_title(<span class="st">'National'</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>d.query(<span class="st">'st == "55" and cty == "000"'</span>)[<span class="st">'pop'</span>].plot(ax<span class="op">=</span>ax[<span class="dv">1</span>])</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].set_title(<span class="st">'Wisconsin'</span>)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>d.query(<span class="st">'st == "55" and cty == "025"'</span>)[<span class="st">'pop'</span>].plot(ax<span class="op">=</span>ax[<span class="dv">2</span>])</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">2</span>].set_title(<span class="st">'Wisconsin, Dane county'</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<p><img src="data_files/figure-html/cell-6-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="employment" class="level1">
+<h1>Employment</h1>
+<p>State and county employment comes from Census Business Dynamics Statistics (<a href="https://www.census.gov/programs-surveys/bds.html">BDS</a>). This product has some improvements over more widely used County Business Patterns, and entire history can be downloaded in a single table from <a href="https://www.census.gov/data/datasets/time-series/econ/bds/bds-datasets.html">here</a>.</p>
+<p>Data does not require much processing which is done in the <code>emp()</code>. National, state and county tables are downloaded and combined, again using convention of setting state to <code>"00"</code> for national and county to <code>"000"</code> for national and state rows. Percentage year-to-year growth rate is renamed from <code>net_job_creation_rate</code> to <code>emp_gr</code>. Data goes back to 1978, but we only need from 1990 for combination with population.</p>
+<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-08-29T06:48:21.005167Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-08-29T06:48:21.004642Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-08-29T06:48:21.040013Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-08-29T06:48:21.038294Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-08-29T06:48:21.005136Z&quot;}" data-tags="[&quot;nbd-docs&quot;]" data-execution_count="13">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>emp().head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="13">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>st</th>
+      <th>cty</th>
+      <th>year</th>
+      <th>emp</th>
+      <th>emp_gr</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>00</td>
+      <td>000</td>
+      <td>1990</td>
+      <td>93983875.0</td>
+      <td>2.145</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>00</td>
+      <td>000</td>
+      <td>1991</td>
+      <td>91781210.0</td>
+      <td>-2.439</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>00</td>
+      <td>000</td>
+      <td>1992</td>
+      <td>91752935.0</td>
+      <td>0.004</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>00</td>
+      <td>000</td>
+      <td>1993</td>
+      <td>93252746.0</td>
+      <td>1.560</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>00</td>
+      <td>000</td>
+      <td>1994</td>
+      <td>95712240.0</td>
+      <td>2.254</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-08-29T06:48:21.055340Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-08-29T06:48:21.054782Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-08-29T06:48:21.580818Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-08-29T06:48:21.578154Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-08-29T06:48:21.055301Z&quot;}" data-tags="[&quot;nbd-docs&quot;]" data-execution_count="14">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>d <span class="op">=</span> emp().set_index(<span class="st">'year'</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">16</span>, <span class="dv">4</span>))</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>d.query(<span class="st">'st == "00" and cty == "000"'</span>)[<span class="st">'emp'</span>].plot(ax<span class="op">=</span>ax[<span class="dv">0</span>])</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].set_title(<span class="st">'National'</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>d.query(<span class="st">'st == "55" and cty == "000"'</span>)[<span class="st">'emp'</span>].plot(ax<span class="op">=</span>ax[<span class="dv">1</span>])</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].set_title(<span class="st">'Wisconsin'</span>)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>d.query(<span class="st">'st == "55" and cty == "025"'</span>)[<span class="st">'emp'</span>].plot(ax<span class="op">=</span>ax[<span class="dv">2</span>])</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">2</span>].set_title(<span class="st">'Wisconsin, Dane county'</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<p><img src="data_files/figure-html/cell-8-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="api" class="level1">
+<h1>API</h1>
+<p>Here is a little demo of retrieving a table from a data provider using API. We are not going to use it in this project, because bulk data download as readily available as CSV files, and API access rates are often limited and may require access key. However for some other data sources API access may be the only option. Another good use case is when whole data is huge, and you are building a web app (dashboard) that only needs to pull small pieces of data at a time.</p>
+<p>Here I show how to query a portion of the BDS dataset from <a href="https://www.census.gov/data/developers/guidance.html">Census Bureau API</a>. Most of Census data products can be accessed like this, and BDS specific documentation is <a href="https://www.census.gov/data/developers/data-sets/business-dynamics.html">here</a> with some query examples <a href="https://api.census.gov/data/timeseries/bds/examples.html">there</a>.</p>
+<p>Typically, to use an API you need to submit a HTTP request and receive back a response. Request queries are customized by chanding parameters of the URL string, and responses return data in JSON, XML or some other format. Python <a href="https://docs.python-requests.org">requests</a> library hides a lot of technical details and is easy to use. When you are constructing your query URL, you can also just open it in a browser for a quick preview.</p>
+<p>Here is a query line that will pull employment data for all counties in Wisconsin from 2015 to 2019.</p>
+<pre><code>https://api.census.gov/data/timeseries/bds?get=NAME,ESTAB,EMP,YEAR&amp;for=county:*&amp;in=state:55&amp;time=from+2015+to+2019&amp;NAICS=00&amp;key=YOUR_KEY_GOES_HERE</code></pre>
+<p>Everything to the left of <code>?</code> is the base URL or endpoint: <code>https://api.census.gov/data/timeseries/bds</code>.</p>
+<p>Everything to the right are key-value parameter pairs, separated by <code>&amp;</code>:<br>
+<code>get=NAME,ESTAB,EMP,YEAR</code> <em>data columns</em><br>
+<code>for=county:*</code> <em>all counties</em><br>
+<code>in=state:55</code> <em>state FIPS code “55” for Wisconsin</em><br>
+<code>time=from+2015+to+2019</code> <em>time series range</em><br>
+<code>NAICS=00</code> <em>“00” for economy-wide employment</em><br>
+<code>key=YOUR_KEY_GOES_HERE</code> <em>drop this part if you don’t have a key</em></p>
+<p>Query limits: &gt; You can include up to 50 variables in a single API query and can make up to 500 queries per IP address per day. More than 500 queries per IP address per day requires that you register for a Census key. That key will be part of your data request URL string.</p>
+<p>Querying without a key will probably work for you, unless you are sharing your IP with many other users. You can obtain a key for free, but you should keep it secret and not accidentally share, for example, by hard-coding it in your code or commiting a file. Here I have my key in a text file that is ignored in <code>.gitignore</code> and only exists in my local copy of the repo. Another common appoach is to store keys in OS environment variables.</p>
+<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-08-29T06:48:21.586344Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-08-29T06:48:21.585806Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-08-29T06:48:22.730738Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-08-29T06:48:22.729598Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-08-29T06:48:21.586309Z&quot;}" data-tags="[&quot;nbd-docs&quot;]" data-execution_count="15">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> nbd.root<span class="op">/</span><span class="st">'census_api_key.txt'</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> p.exists():</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    key <span class="op">=</span> <span class="st">'&amp;key='</span> <span class="op">+</span> p.read_text()</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    key <span class="op">=</span> <span class="st">''</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>base_url <span class="op">=</span> <span class="st">'https://api.census.gov/data/timeseries/bds'</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>st <span class="op">=</span> <span class="st">'55'</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>y0, y1 <span class="op">=</span> <span class="dv">2015</span>, <span class="dv">2019</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>response <span class="op">=</span> requests.get(<span class="ss">f'</span><span class="sc">{</span>base_url<span class="sc">}</span><span class="ss">?get=NAME,ESTAB,EMP,YEAR&amp;for=county:*&amp;in=state:</span><span class="sc">{</span>st<span class="sc">}</span><span class="ss">&amp;time=from+</span><span class="sc">{</span>y0<span class="sc">}</span><span class="ss">+to+</span><span class="sc">{</span>y1<span class="sc">}</span><span class="ss">&amp;NAICS=00</span><span class="sc">{</span>key<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>response_body <span class="op">=</span> response.json()</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>response_body[:<span class="dv">5</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="15">
+<pre><code>[['NAME', 'ESTAB', 'EMP', 'YEAR', 'time', 'NAICS', 'state', 'county'],
+ ['Iron County, Wisconsin', '176', '1360', '2015', '2015', '00', '55', '051'],
+ ['Iron County, Wisconsin', '172', '1416', '2016', '2016', '00', '55', '051'],
+ ['Iron County, Wisconsin', '172', '1337', '2017', '2017', '00', '55', '051'],
+ ['Iron County, Wisconsin', '166', '1362', '2018', '2018', '00', '55', '051']]</code></pre>
+</div>
+</div>
+<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-08-29T06:48:22.732844Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-08-29T06:48:22.732271Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-08-29T06:48:22.760284Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-08-29T06:48:22.755075Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-08-29T06:48:22.732805Z&quot;}" data-tags="[&quot;nbd-docs&quot;]" data-execution_count="16">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame(response_body[<span class="dv">1</span>:], columns<span class="op">=</span>response_body[<span class="dv">0</span>])</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>df.query(<span class="st">'county == "025"'</span>).head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="16">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>NAME</th>
+      <th>ESTAB</th>
+      <th>EMP</th>
+      <th>YEAR</th>
+      <th>time</th>
+      <th>NAICS</th>
+      <th>state</th>
+      <th>county</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>246</th>
+      <td>Dane County, Wisconsin</td>
+      <td>12649</td>
+      <td>269895</td>
+      <td>2015</td>
+      <td>2015</td>
+      <td>00</td>
+      <td>55</td>
+      <td>025</td>
+    </tr>
+    <tr>
+      <th>247</th>
+      <td>Dane County, Wisconsin</td>
+      <td>12974</td>
+      <td>275642</td>
+      <td>2016</td>
+      <td>2016</td>
+      <td>00</td>
+      <td>55</td>
+      <td>025</td>
+    </tr>
+    <tr>
+      <th>248</th>
+      <td>Dane County, Wisconsin</td>
+      <td>13047</td>
+      <td>280403</td>
+      <td>2017</td>
+      <td>2017</td>
+      <td>00</td>
+      <td>55</td>
+      <td>025</td>
+    </tr>
+    <tr>
+      <th>249</th>
+      <td>Dane County, Wisconsin</td>
+      <td>13088</td>
+      <td>297744</td>
+      <td>2018</td>
+      <td>2018</td>
+      <td>00</td>
+      <td>55</td>
+      <td>025</td>
+    </tr>
+    <tr>
+      <th>250</th>
+      <td>Dane County, Wisconsin</td>
+      <td>13099</td>
+      <td>301777</td>
+      <td>2019</td>
+      <td>2019</td>
+      <td>00</td>
+      <td>55</td>
+      <td>025</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    setTimeout(function() {
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
