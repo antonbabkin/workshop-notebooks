@@ -34,7 +34,7 @@ nbd = Nbd('popemp')
 print(f'Project root: "{nbd.root}"')
 # make sure that "nbs/popemp" contains "analysis.py", "data.py" and "tools.py"
 print('"nbs/popemp/" folder contents:')
-%ls {nbd.root/'nbs/popemp'}/
+%ls "{nbd.root/'nbs/popemp'}/"
 ```
 
 # Python environment

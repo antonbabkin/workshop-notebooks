@@ -19,7 +19,9 @@ Workshop topics:
 - visualization of geospatial data, `geopandas`, `folium` and `ipyleaflet`
 - hosting live notebooks on Binder and static documentation on GitHub Pages
 
-Repository state at the time of the original [2022 Data Science Research Bazaar](https://datascience.wisc.edu/data-science-research-bazaar/) is at [2022-02-09](https://github.com/antonbabkin/workshop-notebooks/tree/2022-02-09) tag. Video recording [here](https://www.youtube.com/watch?v=xWiLzdHSowk).
+This workshop has been conducted by Anton Babkin at:
+- Department of Agricultural and Applied Economics, University of Wisconsin-Madison, August 29-30, 2022. Repository tag [`2022-08-29`](https://github.com/antonbabkin/workshop-notebooks/tree/2022-08-29).
+- 2022 Data Science Research Bazaar, University of Wisconsin-Madison, February 9, 2022. Repository tag [`2022-02-09`](https://github.com/antonbabkin/workshop-notebooks/tree/2022-02-09). Video recording [here](https://www.youtube.com/watch?v=xWiLzdHSowk).
 
 ## Setup
 
